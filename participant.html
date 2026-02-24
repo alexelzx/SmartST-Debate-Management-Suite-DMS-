@@ -8,7 +8,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@300;400;600&display=swap');
         :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; }
         body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; z-index: 10;}
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
         .workspace { display: flex; flex: 1; overflow: hidden; }
         .main-stage { flex: 2; padding: 2rem; display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--border); overflow-y: auto; }
         .side-panel { flex: 1; background: #fff; display: flex; flex-direction: column; }
@@ -19,24 +20,32 @@
         .roster-list { flex: 1; overflow-y: auto; padding: 1rem 2rem; }
         .notes-area { flex: 1; position: relative; display: flex; flex-direction: column; border-top: 1px solid var(--border); }
         textarea { flex: 1; border: none; padding: 1.5rem; resize: none; outline: none; line-height: 1.6; }
-        #mention-dropdown { position: absolute; background: #fff; border: 1px solid var(--border); border-radius: 8px; display: none; z-index: 100; max-height: 150px; overflow-y: auto; width: 200px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        #mention-dropdown { position: absolute; background: #fff; border: 1px solid var(--border); border-radius: 8px; display: none; z-index: 100; max-height: 150px; overflow-y: auto; width: 200px; }
         .mention-item { padding: 8px 15px; cursor: pointer; font-size: 0.85rem; }
         .mention-item:hover { background: var(--bg-color); }
         #warning-banner { background: var(--danger); color: white; padding: 1rem; text-align: center; font-weight: 600; display: none; }
         #setup-screen { position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--bg-color); z-index: 200; display: flex; align-items: center; justify-content: center; }
         .btn-request { background: var(--text-color); color: #fff; width: 100%; padding: 1rem; border: none; border-radius: 8px; cursor: pointer; }
+        .id-badge { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 50px; background: #faf9f7; }
     </style>
 </head>
 <body>
     <div id="setup-screen"><div style="background:#fff; padding:3rem; border-radius:16px; width:400px; border:1px solid var(--border);">
         <h2 style="font-family:'Playfair Display',serif;">Identity Declaration</h2>
         <input type="text" id="partName" placeholder="Full Name" style="width:100%; padding:1rem; margin-bottom:1rem; border:1px solid var(--border); border-radius:6px;">
+        <input type="text" id="partTeam" placeholder="Team / Organization" style="width:100%; padding:1rem; margin-bottom:1rem; border:1px solid var(--border); border-radius:6px;">
         <select id="partSide" style="width:100%; padding:1rem; margin-bottom:1rem; border:1px solid var(--border); border-radius:6px;">
             <option value="PRO">PRO</option><option value="CON">CON</option><option value="NEUTRAL">NEUTRAL</option>
         </select>
         <button class="btn-request" onclick="joinForum()">Enter Forum</button>
     </div></div>
-    <nav><div style="font-family:'Playfair Display',serif; font-weight:600;">SmartST Workspace</div><div id="codeDisplay">Session: ---</div></nav>
+    <nav>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="logo">SmartST.</div>
+            <div id="idBadge" class="id-badge" style="display: none;"></div>
+        </div>
+        <div id="codeDisplay" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Session: ---</div>
+    </nav>
     <div id="warning-banner">⚠️ WARNING: <span id="warning-text"></span></div>
     <div class="workspace">
         <div class="main-stage">
@@ -71,15 +80,23 @@
         let participantId = null, inQueue = false, rosterNames = [], timerInterval;
 
         window.joinForum = async () => {
-            const n = document.getElementById('partName').value.trim(); if(!n) return;
+            const n = document.getElementById('partName').value.trim();
+            const t = document.getElementById('partTeam').value.trim() || "--";
+            const s = document.getElementById('partSide').value;
+            if(!n) return;
             participantId = "PART_" + Date.now();
-            await setDoc(doc(db, "debates", joinCode, "participants", participantId), { name: n, side: document.getElementById('partSide').value, warning: "" });
-            document.getElementById('setup-screen').style.display = 'none'; initListeners();
+            await setDoc(doc(db, "debates", joinCode, "participants", participantId), { name: n, side: s, team: t, warning: "", notes: "" });
+            document.getElementById('setup-screen').style.display = 'none';
+            const badge = document.getElementById('idBadge');
+            badge.innerText = `${n} | ${s} (${t})`;
+            badge.style.display = 'block';
+            initListeners();
         };
 
         function initListeners() {
             onSnapshot(doc(db, "debates", joinCode), (s) => {
-                const data = s.data(); document.getElementById('themeDisplay').innerText = data.theme;
+                const data = s.data(); if(!data) return;
+                document.getElementById('themeDisplay').innerText = data.theme;
                 document.getElementById('speakerDisplay').innerText = data.activeSpeakerName;
                 document.getElementById('teamDisplay').innerText = `${data.activeSide || '--'} | ${data.activeTeam || '--'}`;
                 const meSpeaking = data.activeSpeakerId === participantId;
@@ -92,7 +109,7 @@
             });
             onSnapshot(doc(db, "debates", joinCode, "participants", participantId), (s) => {
                 const d = s.data(); const banner = document.getElementById('warning-banner');
-                if(d.warning) { document.getElementById('warning-text').innerText = d.warning; banner.style.display = 'block'; } else banner.style.display = 'none';
+                if(d && d.warning) { document.getElementById('warning-text').innerText = d.warning; banner.style.display = 'block'; } else banner.style.display = 'none';
             });
         }
 
