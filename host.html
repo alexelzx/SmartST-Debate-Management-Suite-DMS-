@@ -2,74 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartST DMS - Executive Host</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
-        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15); --danger: #b3261e; --success: #16a34a; }
-        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; min-height: 100vh; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 3rem; border-bottom: 1px solid var(--border-color); background: #fff; position: sticky; top: 0; z-index: 100; }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@400;600&display=swap');
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-color); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        nav { padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
-        .dashboard-container { max-width: 1400px; margin: 3rem auto; padding: 0 2rem; }
-        button { padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: var(--text-color); color: var(--bg-color); }
-        .btn-outline { background: transparent; border: 1px solid var(--text-color); color: var(--text-color); }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .panel { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .log-box { background: #1e1e1e; color: #a3a3a3; font-family: monospace; padding: 1rem; height: 350px; overflow-y: auto; border-radius: 8px; font-size: 0.8rem; line-height: 1.5; }
+        .participant-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border); background: #faf9f7; border-radius: 8px; margin-bottom: 0.5rem; }
+        button { padding: 0.6rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+        .btn-primary { background: var(--text-color); color: #fff; }
         .btn-success { background: var(--success); color: #fff; }
-        .panel { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0 0 1.5rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
-        .grid-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; }
-        #init-state { max-width: 600px; margin: 0 auto; text-align: center; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: #666; }
+        input { padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 1rem; }
+        #init-state { max-width: 600px; margin: 5rem auto; text-align: center; }
         #active-state { display: none; }
-        input { width: 100%; padding: 1rem; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; }
-        .roster-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; background: #faf9f7;}
-        .queue-badge { font-size: 0.7rem; background: var(--text-color); color: var(--bg-color); padding: 0.2rem 0.6rem; border-radius: 50px; text-transform: uppercase; margin-left: 1rem; }
-        .log-container { background: #1e1e1e; color: #a3a3a3; padding: 1.5rem; border-radius: 8px; font-family: monospace; font-size: 0.8rem; height: 400px; overflow-y: auto; }
-        .log-entry { margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; }
+        .queue-badge { font-size: 0.65rem; background: var(--text-color); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 0.5rem; }
     </style>
 </head>
 <body>
     <nav>
         <div class="logo">SmartST Executive Host</div>
         <div style="display: flex; gap: 1rem;">
-            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">Broadcast TV View</button>
-            <button class="btn-outline" onclick="handleLogout()">End Session</button>
+            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">TV View</button>
+            <button class="btn-outline" onclick="handleLogout()">Logout</button>
         </div>
     </nav>
-    <div class="dashboard-container">
-        <div id="init-state" class="panel">
+
+    <div class="container">
+        <div id="init-state" class="panel" style="grid-column: span 2;">
             <h2>Initialize Framework</h2>
             <input type="text" id="initTheme" placeholder="Resolution / Theme">
             <input type="number" id="baseTimer" placeholder="Default Speaker Timer (Min)" value="5">
             <button class="btn-primary" style="width: 100%;" onclick="generateSession()">Deploy Secure Environment</button>
         </div>
-        <div id="active-state">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: #fff; padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                <div>
-                    <h1 style="font-family: 'Playfair Display', serif; margin:0;">Command Center</h1>
-                    <div style="color: var(--text-muted);">Speaking: <strong id="currentSpeakerLabel" style="color:var(--text-color);">None</strong></div>
+
+        <div id="active-state" style="display: none; grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h3>Roster & Parole Control</h3>
+                    <div id="codeDisplay" style="font-weight: bold; letter-spacing: 2px;">CODE: ------</div>
                 </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Session Code</div>
-                    <div style="font-size: 2.5rem; font-weight: 600; letter-spacing: 4px;" id="displayCode">------</div>
-                    <div style="font-size: 0.8rem; color: var(--danger); font-weight: bold;">Mod PIN: <span id="displayPin">----</span></div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="font-size: 0.75rem; text-transform: uppercase; color: #888;">Override Parole Duration (Min)</label>
+                    <input type="number" id="manualTimer" placeholder="Minutes" style="margin-top: 0.5rem;">
+                    <button class="btn-danger" style="width: 100%;" onclick="revokeFloor()">Halt Current Speaker</button>
                 </div>
+                <div id="participantList"></div>
             </div>
-            <div class="grid-layout">
-                <div class="panel">
-                    <h3>Roster & Queue</h3>
-                    <div style="margin-bottom: 1rem;">
-                        <input type="number" id="manualTimer" placeholder="Minutes" style="width: 100px; display: inline-block; margin-right: 1rem;">
-                        <button class="btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="revokeFloor()">Halt Floor</button>
-                    </div>
-                    <div id="participantList"></div>
-                </div>
-                <div class="panel">
-                    <h3>Executive Audit Log</h3>
-                    <div class="log-container" id="eventLog"></div>
-                </div>
+
+            <div class="panel">
+                <h3>Executive Audit Log</h3>
+                <div class="log-box" id="fullLog"></div>
             </div>
         </div>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -80,100 +72,107 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const isModJoin = urlParams.get('role') === 'moderator';
-        const sessionParam = urlParams.get('code');
         let sessionCode = null, pData = {}, currentQueue = [];
 
-        onAuthStateChanged(auth, (user) => {
-            const hasModPermission = localStorage.getItem(`mod_auth_${sessionParam}`) === "true";
-            if (!user && !hasModPermission) { window.location.href = "auth.html"; return; }
-            if (isModJoin && sessionParam) {
-                sessionCode = sessionParam;
-                document.getElementById('displayCode').innerText = sessionCode;
-                document.getElementById('init-state').style.display = 'none';
-                document.getElementById('active-state').style.display = 'block';
-                document.getElementById('tvBtn').style.display = 'block';
-                initSync();
-            }
-        });
-
+        onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "auth.html"; });
         window.handleLogout = () => signOut(auth).then(() => window.location.href = "index.html");
         window.launchTV = () => window.open(`tv.html?code=${sessionCode}`, 'Projector', 'width=1280,height=720');
 
-        function appendLog(action, detail) {
-            const logBox = document.getElementById('eventLog');
+        function appendLog(action) {
             const time = new Date().toLocaleTimeString();
-            logBox.innerHTML = `<div class="log-entry"><strong>[${time}] ${action}</strong><br>↳ ${detail}</div>` + logBox.innerHTML;
+            const log = document.getElementById('fullLog');
+            log.innerHTML = `<div><span style="color:#818cf8">[${time}]</span> <strong>${action}</strong></div>` + log.innerHTML;
         }
 
         window.generateSession = async () => {
-            try {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                let code = ''; for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-                let pin = Math.floor(1000 + Math.random() * 9000).toString();
-                sessionCode = code;
-                await setDoc(doc(db, "debates", sessionCode), {
-                    theme: document.getElementById('initTheme').value || "General Debate",
-                    modPin: pin, queue: [], activeSpeakerId: null, activeSpeakerName: "Floor Open", isTimerRunning: false, endTimeMs: null
-                });
-                document.getElementById('displayCode').innerText = code; document.getElementById('displayPin').innerText = pin;
-                document.getElementById('init-state').style.display = 'none'; document.getElementById('active-state').style.display = 'block';
-                document.getElementById('tvBtn').style.display = 'block';
-                appendLog("INITIALIZED", `Code: ${code} | PIN: ${pin}`);
-                initSync();
-            } catch (err) { alert(`Error: ${err.message}`); }
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = ''; for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            sessionCode = code;
+            await setDoc(doc(db, "debates", sessionCode), {
+                theme: document.getElementById('initTheme').value || "General Debate",
+                queue: [], activeSpeakerId: null, activeSpeakerName: "Floor Open", activeTeam: "--", activeSide: "--", isTimerRunning: false, endTimeMs: null
+            });
+            document.getElementById('init-state').style.display = 'none';
+            document.getElementById('active-state').style.display = 'grid';
+            document.getElementById('tvBtn').style.display = 'block';
+            document.getElementById('codeDisplay').innerText = `CODE: ${code}`;
+            appendLog(`SESSION INITIALIZED: ${code}`);
+            initSync();
         };
 
         function initSync() {
-            onSnapshot(doc(db, "debates", sessionCode), (s) => { if(s.exists()){ currentQueue = s.data().queue || []; renderRoster(); } });
-            onSnapshot(collection(db, "debates", sessionCode, "participants"), (s) => { s.forEach(d => pData[d.id] = d.data()); renderRoster(); });
+            onSnapshot(doc(db, "debates", sessionCode), (s) => {
+                if(s.exists()){
+                    currentQueue = s.data().queue || [];
+                    renderRoster();
+                }
+            });
+            onSnapshot(collection(db, "debates", sessionCode, "participants"), (s) => {
+                s.forEach(d => pData[d.id] = d.data());
+                renderRoster();
+            });
         }
 
         function renderRoster() {
             const div = document.getElementById('participantList'); div.innerHTML = '';
             let rendered = new Set();
-            currentQueue.forEach((pid, idx) => { if(pData[pid]){ div.appendChild(createRow(pid, pData[pid], idx + 1)); rendered.add(pid); } });
-            for (let pid in pData) { if (!rendered.has(pid)) div.appendChild(createRow(pid, pData[pid], null)); }
+            currentQueue.forEach((pid, idx) => {
+                if(pData[pid]){
+                    div.appendChild(createRow(pid, pData[pid], idx + 1));
+                    rendered.add(pid);
+                }
+            });
+            for (let pid in pData) {
+                if (!renderedIds.has(pid)) div.appendChild(createRow(pid, pData[pid], null));
+            }
         }
 
         function createRow(pid, data, qPos) {
-            const row = document.createElement('div'); row.className = 'roster-row';
+            const row = document.createElement('div'); row.className = 'participant-row';
             let badge = qPos ? `<span class="queue-badge">Q#${qPos}</span>` : '';
-            row.innerHTML = `<div><strong>${data.name}${badge}</strong><br><small>${data.side}</small></div>
-                <div class="action-group">
-                    <button class="btn-success" onclick="grantFloor('${pid}')">Parole</button>
-                    <button class="btn-outline" style="border-color:var(--danger); color:var(--danger);" onclick="issueWarning('${pid}')">Warn</button>
-                    <button class="btn-outline" onclick="clearWarning('${pid}')">Clear</button>
+            row.innerHTML = `
+                <div><strong>${data.name}${badge}</strong><br><small>${data.side} | ${data.team || '--'}</small></div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn-success" onclick="grantParole('${pid}')">Grant</button>
+                    <button class="btn-danger" onclick="issueWarn('${pid}')">Warn</button>
+                    <button class="btn-outline" onclick="clearWarn('${pid}')">Clear</button>
                 </div>`;
             return row;
         }
 
-        window.grantFloor = async (pid) => {
-            const p = pData[pid];
-            const mins = parseInt(document.getElementById('manualTimer').value) || parseInt(document.getElementById('baseTimer').value);
-            await updateDoc(doc(db, "debates", sessionCode), {
-                activeSpeakerId: pid, activeSpeakerName: p.name, activeTeam: p.team, activeSide: p.side,
-                endTimeMs: Date.now() + (mins * 60000), isTimerRunning: true, queue: arrayRemove(pid)
-            });
-            document.getElementById('currentSpeakerLabel').innerText = p.name;
-            appendLog("PAROLE", `${p.name} | ${mins}m`);
+        window.grantParole = async (pid) => {
+            try {
+                const p = pData[pid];
+                const mins = parseInt(document.getElementById('manualTimer').value) || parseInt(document.getElementById('baseTimer').value) || 5;
+                await updateDoc(doc(db, "debates", sessionCode), {
+                    activeSpeakerId: pid,
+                    activeSpeakerName: p.name || "Unknown",
+                    activeTeam: p.team || "--",
+                    activeSide: p.side || "--",
+                    endTimeMs: Date.now() + (mins * 60000),
+                    isTimerRunning: true,
+                    queue: arrayRemove(pid)
+                });
+                appendLog(`PAROLE GRANTED: ${p.name} (${mins}m)`);
+            } catch (err) { alert("Grant Error: " + err.message); }
         };
 
         window.revokeFloor = async () => {
-            await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open" });
-            document.getElementById('currentSpeakerLabel').innerText = "None";
-            appendLog("HALT", "Moderator intervention.");
+            await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open", activeTeam: "--", activeSide: "--" });
+            appendLog("FLOOR REVOKED BY HOST");
         };
 
-        window.issueWarning = async (pid) => {
-            const m = prompt("Warning:");
-            if(m) { await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: m }); appendLog("WARN", `${pData[pid].name}: ${m}`); }
+        window.issueWarn = async (pid) => {
+            const m = prompt("Warning Directive:");
+            if(m) {
+                await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: m });
+                appendLog(`WARNING: ${pData[pid].name} - ${m}`);
+            }
         };
 
-        window.clearWarning = async (pid) => {
+        window.clearWarn = async (pid) => {
             await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: "" });
-            appendLog("CLEAR", `Warning cleared for ${pData[pid].name}`);
+            appendLog(`CLEAR: Warning removed for ${pData[pid].name}`);
         };
     </script>
 </body>
