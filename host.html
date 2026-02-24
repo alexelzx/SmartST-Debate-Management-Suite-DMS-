@@ -3,86 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartST DMS - Host & Moderator Console</title>
+    <title>SmartST DMS - Executive Host</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
-        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15); --danger: #b3261e; --accent: #0f172a; }
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15); --danger: #b3261e; --success: #16a34a; }
         body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; min-height: 100vh; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 4rem; border-bottom: 1px solid var(--border-color); background: rgba(244, 242, 237, 0.9); position: sticky; top: 0; z-index: 100; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 3rem; border-bottom: 1px solid var(--border-color); background: #fff; position: sticky; top: 0; z-index: 100; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
         .dashboard-container { max-width: 1400px; margin: 3rem auto; padding: 0 2rem; }
         
-        button { padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
+        button { padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
         .btn-primary { background: var(--text-color); color: var(--bg-color); }
         .btn-primary:hover { opacity: 0.8; }
         .btn-outline { background: transparent; border: 1px solid var(--text-color); color: var(--text-color); }
-        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
         
-        input, select { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        .panel { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 2rem; }
+        .panel { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
         h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0 0 1.5rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
         
+        /* Layout */
+        .grid-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; }
         #init-state { max-width: 600px; margin: 0 auto; text-align: center; }
         #active-state { display: none; }
-        .grid-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+        input { width: 100%; padding: 1rem; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif; box-sizing: border-box; }
 
-        /* Participant List Styles */
-        .participant-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; }
-        .p-info { flex: 1; }
-        .p-name { font-weight: 600; font-size: 1rem; }
-        .p-meta { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .p-actions { display: flex; gap: 0.5rem; }
-        
-        .log-section { background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; height: 150px; overflow-y: auto; }
+        /* Roster & Queue */
+        .roster-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; background: #faf9f7;}
+        .queue-badge { font-size: 0.7rem; background: var(--text-color); color: var(--bg-color); padding: 0.2rem 0.6rem; border-radius: 50px; text-transform: uppercase; margin-left: 1rem; }
+        .action-group { display: flex; gap: 0.5rem; }
+
+        /* Precision Log */
+        .log-container { background: #1e1e1e; color: #a3a3a3; padding: 1.5rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; height: 400px; overflow-y: auto; }
+        .log-entry { margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; }
+        .log-time { color: #818cf8; margin-right: 0.5rem; }
+        .log-action { color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">SmartST Moderator</div>
+        <div class="logo">SmartST Executive Host</div>
         <div style="display: flex; gap: 1rem;">
-            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">Launch Projector (TV)</button>
-            <button class="btn-outline" onclick="handleLogout()">Logout</button>
+            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">Broadcast TV View</button>
+            <button class="btn-outline" onclick="handleLogout()">Terminate Session</button>
         </div>
     </nav>
 
     <div class="dashboard-container">
         <div id="init-state" class="panel">
-            <h2>Initialize Secure Session</h2>
+            <h2>Initialize Framework</h2>
             <input type="text" id="initTheme" placeholder="Resolution / Theme">
-            <button class="btn-primary" style="width: 100%;" onclick="generateSession()">Deploy & Authenticate</button>
+            <input type="number" id="baseTimer" placeholder="Default Speaker Timer (Min)" value="5" min="1">
+            <button class="btn-primary" style="width: 100%;" onclick="generateSession()">Deploy Secure Environment</button>
         </div>
 
         <div id="active-state">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: #fff; padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color);">
                 <div>
-                    <h1 style="font-family: 'Playfair Display', serif; margin:0;">Active Control Console</h1>
-                    <div style="color: var(--text-muted);">Session: <strong style="color:var(--text-color); font-size:1.5rem;" id="displayCode">------</strong></div>
+                    <h1 style="font-family: 'Playfair Display', serif; margin:0;">Command Center</h1>
+                    <div style="color: var(--text-muted);">Currently Speaking: <strong id="currentSpeakerLabel" style="color:var(--text-color);">None</strong></div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Participant Code</div>
+                    <div style="font-size: 2.5rem; font-weight: 600; letter-spacing: 4px;" id="displayCode">------</div>
+                    <div style="font-size: 0.8rem; color: var(--danger); font-weight: bold; text-transform: uppercase; margin-top: 0.5rem;">Moderator PIN: <span id="displayPin">----</span></div>
                 </div>
             </div>
 
             <div class="grid-layout">
-                <div>
-                    <div class="panel">
-                        <h3>Active Floor Management</h3>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Currently Speaking: <strong id="currentSpeakerLabel">None</strong></div>
-                        <label>Manual Time Allocation (Minutes)</label>
-                        <input type="number" id="timeMinutes" value="5" min="1">
-                        <button class="btn-primary" style="width: 100%; margin-bottom: 0.5rem;" onclick="startCustomTimer()">Force Start Timer</button>
-                        <button class="btn-outline" style="width: 100%; border-color: var(--danger); color: var(--danger);" onclick="stopTimer()">Halt Floor</button>
+                <div class="panel">
+                    <h3>Active Roster & Queue Management</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <input type="number" id="manualTimer" placeholder="Minutes to grant" style="width: 150px; display: inline-block; margin: 0 1rem 0 0;">
+                        <button class="btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="revokeFloor()">Halt Floor / Silence</button>
                     </div>
                     
-                    <div class="panel">
-                        <h3>Event Log</h3>
-                        <div class="log-section" id="eventLog">System Initialized...<br></div>
+                    <div id="participantList">
+                        <div style="color: var(--text-muted); text-align: center; padding: 2rem;">Awaiting connections...</div>
                     </div>
                 </div>
 
                 <div class="panel">
-                    <h3>Participant Roster & Queue</h3>
-                    <div id="participantList">
-                        <div style="color: var(--text-muted); text-align: center; padding: 2rem;">Awaiting connections...</div>
-                    </div>
+                    <h3>Precision Event Log</h3>
+                    <div class="log-container" id="eventLog">
+                        </div>
                 </div>
             </div>
         </div>
@@ -91,7 +95,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot, arrayRemove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0",
@@ -106,117 +110,148 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        let currentSessionCode = null;
-        let debateRef = null;
-        let participantsData = {};
+        let sessionCode = null;
+        let pData = {};
+        let currentQueue = [];
 
         onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "auth.html"; });
         window.handleLogout = () => signOut(auth).then(() => window.location.href = "index.html");
 
-        window.launchTV = () => {
-            if(currentSessionCode) window.open(`tv.html?code=${currentSessionCode}`, 'Projector', 'width=1280,height=720,fullscreen=yes');
-        };
+        window.launchTV = () => window.open(`tv.html?code=${sessionCode}`, 'Projector', 'width=1280,height=720,fullscreen=yes');
 
-        function logEvent(msg) {
+        function appendLog(action, detail) {
             const logBox = document.getElementById('eventLog');
-            const time = new Date().toLocaleTimeString();
-            logBox.innerHTML = `[${time}] ${msg}<br>` + logBox.innerHTML;
+            const ms = new Date().getMilliseconds().toString().padStart(3, '0');
+            const time = `${new Date().toLocaleTimeString()}.${ms}`;
+            const entry = `<div class="log-entry"><span class="log-time">[${time}]</span> <span class="log-action">${action}</span> <br> <span style="margin-left:5.5rem; display:block;">↳ ${detail}</span></div>`;
+            logBox.innerHTML = entry + logBox.innerHTML;
         }
 
         window.generateSession = async () => {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            let code = ''; for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            let pin = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit PIN
             
-            currentSessionCode = code;
-            debateRef = doc(db, "debates", currentSessionCode);
-
-            await setDoc(debateRef, {
+            sessionCode = code;
+            await setDoc(doc(db, "debates", sessionCode), {
                 created: Date.now(),
                 theme: document.getElementById('initTheme').value || "General Debate",
-                activeSpeaker: "Floor Open",
+                modPin: pin,
+                queue: [],
+                activeSpeakerId: null,
+                activeSpeakerName: "Floor Open",
                 activeTeam: "--",
                 activeSide: "--",
                 isTimerRunning: false,
                 endTimeMs: null
             });
 
-            document.getElementById('displayCode').innerText = currentSessionCode;
+            document.getElementById('displayCode').innerText = sessionCode;
+            document.getElementById('displayPin').innerText = pin;
             document.getElementById('init-state').style.display = 'none';
             document.getElementById('active-state').style.display = 'block';
             document.getElementById('tvBtn').style.display = 'block';
 
-            listenToParticipants();
+            appendLog("SYSTEM INITIALIZED", `Session Code: ${code} | Mod PIN: ${pin}`);
+            initSync();
         };
 
-        function listenToParticipants() {
-            const partsRef = collection(db, "debates", currentSessionCode, "participants");
-            onSnapshot(partsRef, (snapshot) => {
-                const listDiv = document.getElementById('participantList');
-                listDiv.innerHTML = '';
-                
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    participantsData[doc.id] = data;
-                    
-                    const row = document.createElement('div');
-                    row.className = 'participant-row';
-                    row.innerHTML = `
-                        <div class="p-info">
-                            <div class="p-name">${data.name}</div>
-                            <div class="p-meta">${data.side} | ${data.team}</div>
-                        </div>
-                        <div class="p-actions">
-                            <button class="btn-primary" onclick="grantFloor('${doc.id}')">Set Active</button>
-                            <button class="btn-outline" style="border-color:var(--danger); color:var(--danger);" onclick="issueWarning('${doc.id}')">Warn</button>
-                            <button class="btn-outline" onclick="clearWarning('${doc.id}')">Clear Warn</button>
-                        </div>
-                    `;
-                    listDiv.appendChild(row);
-                });
+        function initSync() {
+            // Listen to main debate doc for queue changes
+            onSnapshot(doc(db, "debates", sessionCode), (docSnap) => {
+                if (docSnap.exists()) {
+                    currentQueue = docSnap.data().queue || [];
+                    renderRoster();
+                }
+            });
+
+            // Listen to participants
+            onSnapshot(collection(db, "debates", sessionCode, "participants"), (snapshot) => {
+                snapshot.forEach((doc) => { pData[doc.id] = doc.data(); });
+                renderRoster();
             });
         }
 
+        function renderRoster() {
+            const listDiv = document.getElementById('participantList');
+            listDiv.innerHTML = '';
+            
+            // Render queued participants first
+            let renderedIds = new Set();
+            
+            currentQueue.forEach((pid, index) => {
+                if(pData[pid]) {
+                    listDiv.appendChild(createRow(pid, pData[pid], index + 1));
+                    renderedIds.add(pid);
+                }
+            });
+
+            // Render rest
+            for (let pid in pData) {
+                if (!renderedIds.has(pid)) {
+                    listDiv.appendChild(createRow(pid, pData[pid], null));
+                }
+            }
+        }
+
+        function createRow(pid, data, queuePos) {
+            const row = document.createElement('div');
+            row.className = 'roster-row';
+            let badge = queuePos ? `<span class="queue-badge">Queue Pos: ${queuePos}</span>` : '';
+            
+            row.innerHTML = `
+                <div>
+                    <div style="font-weight: 600;">${data.name} ${badge}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">${data.side} | ${data.team}</div>
+                </div>
+                <div class="action-group">
+                    <button class="btn-success" onclick="grantFloor('${pid}')">Grant Parole</button>
+                    <button class="btn-outline" style="border-color:var(--danger); color:var(--danger);" onclick="issueWarning('${pid}')">Warn</button>
+                </div>
+            `;
+            return row;
+        }
+
         window.grantFloor = async (pid) => {
-            const p = participantsData[pid];
-            const minutes = parseInt(document.getElementById('timeMinutes').value) || 5;
+            const p = pData[pid];
+            const minutes = parseInt(document.getElementById('manualTimer').value) || 5;
             const endTimeMs = Date.now() + (minutes * 60000);
 
-            await updateDoc(debateRef, {
-                activeSpeaker: p.name,
+            // Update global debate state and remove from queue
+            await updateDoc(doc(db, "debates", sessionCode), {
+                activeSpeakerId: pid,
+                activeSpeakerName: p.name,
                 activeTeam: p.team,
                 activeSide: p.side,
                 endTimeMs: endTimeMs,
-                isTimerRunning: true
+                isTimerRunning: true,
+                queue: arrayRemove(pid)
             });
             
             document.getElementById('currentSpeakerLabel').innerText = p.name;
-            logEvent(`Floor granted to ${p.name} for ${minutes} min.`);
+            appendLog("PAROLE GRANTED", `Speaker: ${p.name} | Duration: ${minutes} min`);
+        };
+
+        window.revokeFloor = async () => {
+            await updateDoc(doc(db, "debates", sessionCode), { 
+                isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open", activeTeam: "--", activeSide: "--" 
+            });
+            document.getElementById('currentSpeakerLabel').innerText = "None";
+            appendLog("FLOOR REVOKED", "Moderator forced silence.");
         };
 
         window.issueWarning = async (pid) => {
-            const msg = prompt("Enter warning message for participant (e.g., Time check, Respect protocol):");
+            const msg = prompt("Enter specific warning directive for this participant:");
             if(msg) {
-                await updateDoc(doc(db, "debates", currentSessionCode, "participants", pid), { warning: msg });
-                logEvent(`Issued warning to ${participantsData[pid].name}: ${msg}`);
+                await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: msg });
+                appendLog("WARNING ISSUED", `Target: ${pData[pid].name} | Directive: ${msg}`);
+                
+                // Auto-clear warning after 10 seconds so it doesn't get stuck on their screen forever
+                setTimeout(() => {
+                    updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: "" });
+                    appendLog("WARNING CLEARED", `Auto-cleared for ${pData[pid].name}`);
+                }, 10000);
             }
-        };
-
-        window.clearWarning = async (pid) => {
-            await updateDoc(doc(db, "debates", currentSessionCode, "participants", pid), { warning: "" });
-            logEvent(`Cleared warning for ${participantsData[pid].name}`);
-        };
-
-        window.startCustomTimer = async () => {
-            const minutes = parseInt(document.getElementById('timeMinutes').value) || 5;
-            await updateDoc(debateRef, { endTimeMs: Date.now() + (minutes * 60000), isTimerRunning: true });
-            logEvent(`Timer forced update: ${minutes} min.`);
-        };
-
-        window.stopTimer = async () => {
-            await updateDoc(debateRef, { isTimerRunning: false, activeSpeaker: "Floor Open", activeTeam: "--", activeSide: "--" });
-            document.getElementById('currentSpeakerLabel').innerText = "None";
-            logEvent("Floor halted by Moderator.");
         };
     </script>
 </body>
