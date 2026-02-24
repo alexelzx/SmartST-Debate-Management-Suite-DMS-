@@ -6,248 +6,101 @@
     <title>SmartST DMS - Projector View</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
-
-        :root {
-            --bg-overlay: rgba(244, 242, 237, 0.92); /* Strong beige overlay for readability */
-            --text-color: #1C1C1C;
-            --text-muted: #555555; 
-            --border-color: rgba(28, 28, 28, 0.15);
-            --danger: #b3261e;
-        }
-
-        body {
-            margin: 0; 
-            color: var(--text-color);
-            font-family: 'Inter', sans-serif; 
-            -webkit-font-smoothing: antialiased;
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh;
-            overflow: hidden;
-            /* Theme Background Image */
-            background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
-            position: relative;
-        }
-
-        /* Overlay to ensure text pops off the background image */
-        .bg-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg-overlay);
-            backdrop-filter: blur(10px);
-            z-index: -1;
-        }
-
-        /* Minimalist Header */
-        nav {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 2rem 5rem; 
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(255,255,255,0.5); /* Subtle separation */
-        }
-        
-        .logo { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 2.5rem; 
-            font-weight: 600; 
-            letter-spacing: -1px; 
-        }
-        
-        .session-badge {
-            font-size: 1.5rem; 
-            font-weight: 500;
-            text-transform: uppercase; 
-            letter-spacing: 4px;
-            color: var(--text-muted); 
-            padding: 1rem 2rem; 
-            border: 2px solid var(--border-color); 
-            border-radius: 50px;
-        }
-
-        /* Massive Central Display */
-        .projector-container {
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            padding: 4rem; 
-            text-align: center; 
-            width: 100%; 
-            box-sizing: border-box;
-        }
-
-        .theme-display { 
-            font-size: 2rem; 
-            text-transform: uppercase; 
-            letter-spacing: 6px; 
-            color: var(--text-muted); 
-            margin-bottom: 4rem; 
-            font-weight: 600;
-        }
-        
-        .speaker-card {
-            background: rgba(255, 255, 255, 0.95); /* high contrast card */
-            border: 1px solid var(--border-color); 
-            border-radius: 24px;
-            padding: 6rem; 
-            width: 90%; 
-            max-width: 1600px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.08); 
-            box-sizing: border-box;
-            backdrop-filter: blur(20px);
-        }
-
-        /* Position & Team Identifier */
-        .meta-info { 
-            display: inline-block; 
-            font-size: 1.8rem; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            letter-spacing: 4px; 
-            color: var(--text-muted); 
-            margin-bottom: 2rem; 
-            padding: 1rem 3rem;
-            background: rgba(28, 28, 28, 0.05);
-            border-radius: 100px;
-        }
-        
-        /* Who Speaks */
-        .speaker-name { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 7vw; /* Viewport width scaling for massive screens */
-            font-weight: 400; 
-            margin: 0 0 2rem 0; 
-            line-height: 1.1; 
-            letter-spacing: -2px;
-            color: var(--text-color);
-        }
-        
-        /* The Chronometer */
-        .timer { 
-            font-family: 'Inter', sans-serif; 
-            font-size: 15vw; /* Massive timer */
-            font-weight: 300; 
-            font-variant-numeric: tabular-nums; 
-            line-height: 1; 
-            letter-spacing: -5px; 
-            transition: color 0.3s; 
-            color: var(--text-color);
-        }
-        
-        .timer.danger { 
-            color: var(--danger); 
-            animation: pulse 1.5s infinite; 
-        }
-
-        @keyframes pulse { 
-            0% { opacity: 1; } 
-            50% { opacity: 0.6; } 
-            100% { opacity: 1; } 
-        }
-
+        :root { --bg-overlay: rgba(244, 242, 237, 0.94); --text-color: #1C1C1C; --text-muted: #666666; --border: rgba(28, 28, 28, 0.1); --danger: #b3261e; }
+        body { margin: 0; color: var(--text-color); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; display: flex; flex-direction: column; }
+        .bg-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-overlay); backdrop-filter: blur(15px); z-index: -1; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.3); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 600; }
+        .session-badge { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); padding: 0.8rem 1.5rem; border: 2px solid var(--border); border-radius: 50px; }
+        .main-display { flex: 1; display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; padding: 3rem 4rem; box-sizing: border-box; }
+        .active-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(255,255,255,0.6); border-radius: 24px; border: 1px solid var(--border); padding: 4rem; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
+        .theme-title { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 5px; color: var(--text-muted); margin-bottom: 3rem; font-weight: 500; }
+        .meta-info { font-size: 1.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 4px; color: var(--text-muted); margin-bottom: 1.5rem; padding: 0.5rem 2rem; background: rgba(0,0,0,0.04); border-radius: 100px; }
+        .speaker-name { font-family: 'Playfair Display', serif; font-size: 6vw; font-weight: 400; margin: 0 0 1rem 0; line-height: 1.1; letter-spacing: -2px; }
+        .timer { font-size: 12vw; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -5px; }
+        .timer.danger { color: var(--danger); animation: pulse 1s infinite; }
+        .queue-sidebar { background: rgba(255,255,255,0.4); border-radius: 24px; border: 1px solid var(--border); padding: 2.5rem; display: flex; flex-direction: column; }
+        .queue-header { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem; }
+        .queue-list { flex: 1; overflow-y: auto; }
+        .queue-item { display: flex; align-items: center; padding: 1.2rem; background: rgba(255,255,255,0.7); border-radius: 12px; margin-bottom: 1rem; border: 1px solid var(--border); }
+        .queue-pos { font-weight: 600; width: 40px; height: 40px; background: var(--text-color); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; font-size: 1rem; }
+        .queue-name { font-size: 1.3rem; font-weight: 500; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
     </style>
 </head>
 <body>
-
     <div class="bg-overlay"></div>
-
     <nav>
         <div class="logo">SmartST.</div>
         <div class="session-badge" id="codeDisplay">SESSION: ---</div>
     </nav>
-
-    <div class="projector-container">
-        <div class="theme-display" id="themeDisplay">Awaiting Host Initialization</div>
-        
-        <div class="speaker-card">
+    <div class="main-display">
+        <div class="active-stage">
+            <div class="theme-title" id="themeDisplay">Initializing Forum...</div>
             <div class="meta-info" id="teamDisplay">-- | --</div>
             <h2 class="speaker-name" id="speakerDisplay">Floor Open</h2>
             <div class="timer" id="timeDisplay">00:00</div>
         </div>
+        <div class="queue-sidebar">
+            <div class="queue-header">Parole Queue</div>
+            <div class="queue-list" id="queueList"></div>
+        </div>
     </div>
-
     <script type="module">
-        // (Firebase Logic remains unchanged from previous working version)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0",
-            authDomain: "smartst-debate.firebaseapp.com",
-            projectId: "smartst-debate",
-            storageBucket: "smartst-debate.firebasestorage.app",
-            messagingSenderId: "128238171772",
-            appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9"
-        };
-
+        import { getFirestore, doc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        const firebaseConfig = { apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0", authDomain: "smartst-debate.firebaseapp.com", projectId: "smartst-debate", storageBucket: "smartst-debate.firebasestorage.app", messagingSenderId: "128238171772", appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
         const urlParams = new URLSearchParams(window.location.search);
         const joinCode = urlParams.get('code');
-        let timerInterval;
+        let timerInterval, pNames = {};
 
         if (joinCode) {
             document.getElementById('codeDisplay').innerText = `SESSION: ${joinCode}`;
             const debateRef = doc(db, "debates", joinCode);
-            
-            onSnapshot(debateRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('themeDisplay').innerText = data.theme || "Resolution Pending";
-                    document.getElementById('speakerDisplay').innerText = data.activeSpeaker || "Floor Open";
-                    
-                    // Combines Side and Team into one display
-                    const teamStr = data.activeTeam && data.activeTeam !== "--" ? data.activeTeam : "Unaffiliated";
-                    const sideStr = data.activeSide && data.activeSide !== "--" ? data.activeSide : "Neutral";
-                    document.getElementById('teamDisplay').innerText = `${sideStr} | ${teamStr}`;
-                    
+            const partsRef = collection(db, "debates", joinCode, "participants");
+
+            // Sync Participant Names for Queue mapping
+            onSnapshot(partsRef, (snap) => {
+                snap.forEach(d => pNames[d.id] = d.data().name);
+                // Refresh queue if data already exists
+                getDoc(debateRef).then(s => { if(s.exists()) renderQueue(s.data().queue || []); });
+            });
+
+            onSnapshot(debateRef, (s) => {
+                if (s.exists()) {
+                    const data = s.data();
+                    document.getElementById('themeDisplay').innerText = data.theme || "General Resolution";
+                    document.getElementById('speakerDisplay').innerText = data.activeSpeakerName || "Floor Open";
+                    document.getElementById('teamDisplay').innerText = `${data.activeSide || '--'} | ${data.activeTeam || '--'}`;
+                    renderQueue(data.queue || []);
                     manageTimer(data.endTimeMs, data.isTimerRunning);
-                } else {
-                    // Handle session termination
-                    document.getElementById('themeDisplay').innerText = "Session Terminated";
-                    document.getElementById('speakerDisplay').innerText = "Forum Closed";
-                    document.getElementById('teamDisplay').innerText = "-- | --";
-                    document.getElementById('timeDisplay').innerText = "--:--";
                 }
             });
-        } else {
-             // Handle missing code error (as seen in your image_3.png)
-            document.getElementById('themeDisplay').innerText = "System Error";
-            document.getElementById('speakerDisplay').innerText = "No Session Code Provided";
-            document.getElementById('teamDisplay').innerText = "-- | --";
-            document.getElementById('timeDisplay').innerText = "--:--";
         }
 
-        function manageTimer(endTimeMs, isRunning) {
+        function renderQueue(queueArray) {
+            const list = document.getElementById('queueList');
+            list.innerHTML = '';
+            queueArray.forEach((pid, idx) => {
+                const name = pNames[pid] || "Identifying...";
+                list.innerHTML += `<div class="queue-item"><div class="queue-pos">${idx + 1}</div><div class="queue-name">${name}</div></div>`;
+            });
+            if(queueArray.length === 0) list.innerHTML = '<div style="color:#888; text-align:center; margin-top:2rem;">Queue is currently empty.</div>';
+        }
+
+        function manageTimer(end, running) {
             clearInterval(timerInterval);
             const display = document.getElementById('timeDisplay');
-
-            if (!isRunning || !endTimeMs) {
-                display.classList.remove('danger');
-                display.innerText = "00:00";
-                return;
-            }
-
+            if (!running || !end) { display.classList.remove('danger'); display.innerText = "00:00"; return; }
             timerInterval = setInterval(() => {
-                const now = Date.now();
-                const remainingMs = endTimeMs - now;
-
-                if (remainingMs <= 0) {
-                    clearInterval(timerInterval);
-                    display.innerText = "00:00";
-                    display.classList.add('danger');
-                } else {
-                    const minutes = Math.floor(remainingMs / 60000);
-                    const seconds = Math.floor((remainingMs % 60000) / 1000);
-                    display.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    
-                    if (remainingMs < 15000) display.classList.add('danger'); 
-                    else display.classList.remove('danger');
+                const rem = end - Date.now();
+                if (rem <= 0) { clearInterval(timerInterval); display.innerText = "00:00"; display.classList.add('danger'); }
+                else {
+                    const m = Math.floor(rem / 60000), s = Math.floor((rem % 60000) / 1000);
+                    display.innerText = `${m}:${s.toString().padStart(2, '0')}`;
+                    if (rem < 15000) display.classList.add('danger'); else display.classList.remove('danger');
                 }
             }, 100);
         }
