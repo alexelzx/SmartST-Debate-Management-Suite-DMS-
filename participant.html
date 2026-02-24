@@ -3,89 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartST DMS - Participant Forum</title>
+    <title>SmartST DMS - Participant</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
-
-        :root {
-            --bg-color: #F4F2ED; --text-color: #1C1C1C;
-            --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15);
-            --danger: #b3261e;
-        }
-
-        body {
-            margin: 0; background-color: var(--bg-color); color: var(--text-color);
-            font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased;
-            display: flex; flex-direction: column; min-height: 100vh;
-        }
-
-        nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 1.5rem 4rem; border-bottom: 1px solid var(--border-color);
-        }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.5px; }
-        .session-badge {
-            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;
-            color: var(--text-muted); padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 50px;
-        }
-
-        .forum-container {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 2rem; text-align: center; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box;
-        }
-
-        .theme-display { font-size: 1rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); margin-bottom: 3rem; }
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15); --danger: #b3261e; --warning: #d97706; }
+        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid var(--border-color); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; }
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; width: 100%; max-width: 600px; margin: 0 auto; box-sizing: border-box; }
         
-        .speaker-card {
-            background: #ffffff; border: 1px solid var(--border-color); border-radius: 16px;
-            padding: 4rem; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.04); box-sizing: border-box;
-        }
+        /* Registration Form */
+        #registration-state { width: 100%; background: #fff; padding: 3rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 2rem; text-align: center; }
+        label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.5rem; }
+        input, select { width: 100%; padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 1rem; background: var(--text-color); color: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+        button:hover { opacity: 0.8; }
 
-        .meta-info { display: inline-block; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 1rem; }
-        .speaker-name { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 400; margin: 0 0 2rem 0; line-height: 1.1; }
-        
-        .timer { font-family: 'Inter', sans-serif; font-size: 7rem; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -2px; transition: color 0.3s; }
-        .timer.danger { color: var(--danger); animation: pulse 1.5s infinite; }
-
+        /* Forum View */
+        #forum-state { display: none; width: 100%; text-align: center; }
+        .speaker-card { background: #fff; border: 1px solid var(--border-color); border-radius: 16px; padding: 4rem; margin-bottom: 2rem; }
+        .timer { font-size: 6rem; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.3s; }
+        .timer.danger { color: var(--danger); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        .leave-btn {
-            margin-top: 3rem; background: transparent; border: 1px solid var(--border-color);
-            padding: 0.8rem 2rem; border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 0.8rem;
-            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; color: var(--text-muted); transition: 0.2s;
-        }
-        .leave-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-color); }
-
-        @media (max-width: 768px) {
-            nav { padding: 1.5rem 2rem; }
-            .speaker-card { padding: 2.5rem 1.5rem; }
-            .speaker-name { font-size: 2.5rem; }
-            .timer { font-size: 4.5rem; }
-        }
+        /* Warning Overlay */
+        #warning-banner { display: none; background: var(--danger); color: #fff; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; animation: slideDown 0.3s ease-out; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
     <nav>
         <div class="logo">SmartST.</div>
-        <div class="session-badge" id="codeDisplay">Session: ---</div>
+        <div id="codeDisplay" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;">Session: ---</div>
     </nav>
 
-    <div class="forum-container">
-        <div class="theme-display" id="themeDisplay">Awaiting Host Initialization</div>
+    <div class="container">
         
-        <div class="speaker-card">
-            <div class="meta-info" id="teamDisplay">-- | --</div>
-            <h2 class="speaker-name" id="speakerDisplay">Floor Open</h2>
-            <div class="timer" id="timeDisplay">00:00</div>
+        <div id="registration-state">
+            <h1>Declare Identity</h1>
+            <label>Full Name</label>
+            <input type="text" id="partName" placeholder="Enter your name">
+            
+            <label>Alignment</label>
+            <select id="partSide">
+                <option value="PRO">In Favor (PRO)</option>
+                <option value="CON">Against (CON)</option>
+                <option value="NEUTRAL">Neutral</option>
+            </select>
+            
+            <label>Team / Organization (Optional)</label>
+            <input type="text" id="partTeam" placeholder="e.g., EFPRP">
+            
+            <button onclick="registerParticipant()">Enter Forum</button>
         </div>
 
-        <button class="leave-btn" onclick="window.location.href='index.html'">Disconnect from Forum</button>
+        <div id="forum-state">
+            <div id="warning-banner">⚠️ MODERATOR WARNING: <span id="warning-text"></span></div>
+            
+            <div style="text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); margin-bottom: 2rem;" id="themeDisplay">Resolution Pending</div>
+            
+            <div class="speaker-card">
+                <div style="font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;" id="teamDisplay">-- | --</div>
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 3rem; margin: 0 0 2rem 0;" id="speakerDisplay">Floor Open</h2>
+                <div class="timer" id="timeDisplay">00:00</div>
+            </div>
+        </div>
+
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0",
@@ -101,57 +91,74 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const joinCode = urlParams.get('code');
+        let participantId = null;
         let timerInterval;
 
-        if (joinCode) {
-            document.getElementById('codeDisplay').innerText = `Session: ${joinCode}`;
-            const debateRef = doc(db, "debates", joinCode);
+        if (joinCode) document.getElementById('codeDisplay').innerText = `Session: ${joinCode}`;
+        else window.location.href = 'index.html';
+
+        window.registerParticipant = async () => {
+            const name = document.getElementById('partName').value.trim();
+            if (!name) return alert("Sir, your name is required for the official record.");
             
-            onSnapshot(debateRef, (docSnap) => {
+            participantId = "PART_" + Date.now() + Math.floor(Math.random() * 1000);
+            const pRef = doc(db, "debates", joinCode, "participants", participantId);
+            
+            await setDoc(pRef, {
+                name: name,
+                side: document.getElementById('partSide').value,
+                team: document.getElementById('partTeam').value || "--",
+                warning: "",
+                status: "waiting"
+            });
+
+            document.getElementById('registration-state').style.display = 'none';
+            document.getElementById('forum-state').style.display = 'block';
+            
+            initializeListeners();
+        };
+
+        function initializeListeners() {
+            // Main Debate Listener
+            onSnapshot(doc(db, "debates", joinCode), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById('themeDisplay').innerText = data.theme || "Resolution Pending";
                     document.getElementById('speakerDisplay').innerText = data.activeSpeaker || "Floor Open";
-                    
-                    const teamStr = data.activeTeam && data.activeTeam !== "--" ? data.activeTeam : "Unaffiliated";
-                    const sideStr = data.activeSide && data.activeSide !== "--" ? data.activeSide : "Neutral";
-                    document.getElementById('teamDisplay').innerText = `${sideStr} | ${teamStr}`;
-                    
+                    document.getElementById('teamDisplay').innerText = `${data.activeSide || "--"} | ${data.activeTeam || "--"}`;
                     manageTimer(data.endTimeMs, data.isTimerRunning);
-                } else {
-                    alert("Sir, this session code appears invalid or has been terminated by the Host.");
-                    window.location.href = 'index.html';
                 }
             });
-        } else {
-            window.location.href = 'index.html';
+
+            // Personal Warning Listener
+            onSnapshot(doc(db, "debates", joinCode, "participants", participantId), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const banner = document.getElementById('warning-banner');
+                    if (data.warning && data.warning !== "") {
+                        document.getElementById('warning-text').innerText = data.warning;
+                        banner.style.display = 'block';
+                    } else {
+                        banner.style.display = 'none';
+                    }
+                }
+            });
         }
 
         function manageTimer(endTimeMs, isRunning) {
             clearInterval(timerInterval);
             const display = document.getElementById('timeDisplay');
-
-            if (!isRunning || !endTimeMs) {
-                display.classList.remove('danger');
-                display.innerText = "00:00";
-                return;
-            }
+            if (!isRunning || !endTimeMs) { display.classList.remove('danger'); display.innerText = "00:00"; return; }
 
             timerInterval = setInterval(() => {
-                const now = Date.now();
-                const remainingMs = endTimeMs - now;
-
+                const remainingMs = endTimeMs - Date.now();
                 if (remainingMs <= 0) {
-                    clearInterval(timerInterval);
-                    display.innerText = "00:00";
-                    display.classList.add('danger');
+                    clearInterval(timerInterval); display.innerText = "00:00"; display.classList.add('danger');
                 } else {
                     const minutes = Math.floor(remainingMs / 60000);
                     const seconds = Math.floor((remainingMs % 60000) / 1000);
                     display.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    
-                    if (remainingMs < 15000) display.classList.add('danger'); // Pulses at 15 seconds
-                    else display.classList.remove('danger');
+                    if (remainingMs < 15000) display.classList.add('danger'); else display.classList.remove('danger');
                 }
             }, 100);
         }
