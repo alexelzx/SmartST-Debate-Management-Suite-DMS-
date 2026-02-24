@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartST DMS - Host Dashboard</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
         :root {
             --bg-color: #F4F2ED; --text-color: #1C1C1C;
@@ -29,31 +29,22 @@
         .logout-btn { background: transparent; border: none; font-family: 'Inter', sans-serif; font-size: 0.85rem; text-transform: uppercase; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
         .logout-btn:hover { color: var(--text-color); }
 
-        .dashboard-container { max-width: 1000px; margin: 4rem auto; padding: 0 2rem; width: 100%; box-sizing: border-box; }
+        .dashboard-container { max-width: 1200px; margin: 4rem auto; padding: 0 2rem; width: 100%; box-sizing: border-box; }
         
-        /* Initialization State */
-        #init-state { text-align: center; padding: 4rem 0; }
         h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 400; margin: 0 0 1rem 0; letter-spacing: -1px; }
         .subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 3rem; font-weight: 300; }
         
         button {
             padding: 1rem 2rem; border: none; border-radius: 8px; font-family: 'Inter', sans-serif;
             font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer; transition: 0.3s;
+            cursor: pointer; transition: 0.3s; width: 100%;
         }
         .btn-primary { background: var(--text-color); color: var(--bg-color); }
         .btn-primary:hover { opacity: 0.8; transform: translateY(-2px); }
         .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
         .btn-danger:hover { background: rgba(179, 38, 30, 0.05); }
 
-        /* Active Dashboard State */
-        #active-state { display: none; }
-        .header-panel { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border-color); }
-        .session-code { font-family: 'Inter', sans-serif; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
-        .session-code span { font-size: 2rem; font-weight: 600; color: var(--text-color); display: block; margin-top: 0.5rem; letter-spacing: 4px;}
-
-        .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
-        .control-panel { background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; padding: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .control-panel { background: #ffffff; border: 1px solid var(--border-color); border-radius: 12px; padding: 3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 2rem;}
         .control-panel h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin: 0 0 2rem 0; }
 
         label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.5rem; }
@@ -63,6 +54,17 @@
             box-sizing: border-box; outline: none; transition: 0.3s;
         }
         input:focus, select:focus { border-color: var(--text-color); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+        /* States */
+        #init-state { display: block; max-width: 800px; margin: 0 auto; }
+        #active-state { display: none; }
+        
+        .header-panel { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border-color); }
+        .session-code { font-family: 'Inter', sans-serif; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: right;}
+        .session-code span { font-size: 2.5rem; font-weight: 600; color: var(--text-color); display: block; margin-top: 0.5rem; letter-spacing: 4px;}
+        .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
 
     </style>
 </head>
@@ -76,9 +78,36 @@
     <div class="dashboard-container">
         
         <div id="init-state">
-            <h1>Initialize Discourse</h1>
-            <p class="subtitle">Generate a secure cryptographic key to launch a new debate environment.</p>
-            <button class="btn-primary" onclick="generateSession()">Create New Session</button>
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h1>Initialize Discourse</h1>
+                <p class="subtitle">Configure parameters to generate a secure cryptographic key.</p>
+            </div>
+
+            <div class="control-panel">
+                <label>Debate Resolution / Theme</label>
+                <input type="text" id="initTheme" placeholder="e.g., European Policy Directive 4A">
+                
+                <div class="form-grid">
+                    <div>
+                        <label>Maximum Participants</label>
+                        <input type="number" id="initMaxPax" value="4" min="2">
+                    </div>
+                    <div>
+                        <label>Total Debate Duration (Minutes)</label>
+                        <input type="number" id="initTotalTime" value="60" min="5">
+                    </div>
+                    <div>
+                        <label>Base Speaking Time (Minutes)</label>
+                        <input type="number" id="initSpeakTime" value="5" min="1">
+                    </div>
+                    <div>
+                        <label>Number of Factions/Teams</label>
+                        <input type="number" id="initTeams" value="2" min="1">
+                    </div>
+                </div>
+                
+                <button class="btn-primary" style="margin-top: 1rem;" onclick="generateSession()">Deploy Session Environment</button>
+            </div>
         </div>
 
         <div id="active-state">
@@ -91,12 +120,11 @@
             </div>
 
             <div class="control-grid">
-                
                 <div class="control-panel">
                     <h3>Forum Configuration</h3>
-                    <label>Debate Theme / Resolution</label>
-                    <input type="text" id="themeInput" placeholder="e.g., Rural Preservation Directives">
-                    <button class="btn-primary" style="width: 100%; margin-bottom: 2rem;" onclick="updateTheme()">Broadcast Theme</button>
+                    <label>Debate Resolution / Theme</label>
+                    <input type="text" id="themeInput">
+                    <button class="btn-primary" style="margin-bottom: 2rem;" onclick="updateTheme()">Broadcast Theme Update</button>
                 </div>
 
                 <div class="control-panel">
@@ -105,26 +133,29 @@
                     <label>Participant Name</label>
                     <input type="text" id="speakerName" placeholder="Name of Speaker">
                     
-                    <label>Representing Team / Faction</label>
-                    <input type="text" id="speakerTeam" placeholder="Team Designation">
-                    
-                    <label>Alignment</label>
-                    <select id="speakerSide">
-                        <option value="PRO">In Favor (PRO)</option>
-                        <option value="CON">Against (CON)</option>
-                        <option value="NEUTRAL">Neutral / Moderator</option>
-                    </select>
+                    <div class="form-grid">
+                        <div>
+                            <label>Faction / Team</label>
+                            <input type="text" id="speakerTeam" placeholder="Team Designation">
+                        </div>
+                        <div>
+                            <label>Alignment</label>
+                            <select id="speakerSide">
+                                <option value="PRO">In Favor (PRO)</option>
+                                <option value="CON">Against (CON)</option>
+                                <option value="NEUTRAL">Neutral / Moderator</option>
+                            </select>
+                        </div>
+                    </div>
                     
                     <label>Time Allocation (Minutes)</label>
-                    <input type="number" id="timeMinutes" value="5" min="1" max="60">
+                    <input type="number" id="timeMinutes" value="5" min="1">
 
-                    <button class="btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="setSpeaker()">Grant Floor & Start Timer</button>
-                    <button class="btn-danger" style="width: 100%;" onclick="stopTimer()">Revoke Floor / Halt Timer</button>
+                    <button class="btn-primary" style="margin-bottom: 1rem;" onclick="setSpeaker()">Grant Floor & Initiate Timer</button>
+                    <button class="btn-danger" onclick="stopTimer()">Revoke Floor / Halt Timer</button>
                 </div>
-
             </div>
         </div>
-
     </div>
 
     <script type="module">
@@ -148,41 +179,57 @@
         let currentSessionCode = null;
         let debateRef = null;
 
-        // Security Check
         onAuthStateChanged(auth, (user) => {
             if (!user) { window.location.href = "auth.html"; }
         });
 
         window.handleLogout = () => {
-            signOut(auth).then(() => { window.location.href = "main.html"; });
+            signOut(auth).then(() => { window.location.href = "index.html"; });
         };
 
         window.generateSession = async () => {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = '';
-            for (let i = 0; i < 6; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
-            
-            currentSessionCode = code;
-            debateRef = doc(db, "debates", currentSessionCode);
+            try {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = '';
+                for (let i = 0; i < 6; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
+                
+                currentSessionCode = code;
+                debateRef = doc(db, "debates", currentSessionCode);
 
-            await setDoc(debateRef, {
-                created: Date.now(),
-                theme: "Pending Configuration",
-                activeSpeaker: "Floor Open",
-                activeTeam: "--",
-                activeSide: "--",
-                isTimerRunning: false,
-                endTimeMs: null
-            });
+                const initTheme = document.getElementById('initTheme').value || "Resolution Pending";
+                const baseTime = document.getElementById('initSpeakTime').value || 5;
 
-            document.getElementById('displayCode').innerText = currentSessionCode;
-            document.getElementById('init-state').style.display = 'none';
-            document.getElementById('active-state').style.display = 'block';
+                await setDoc(debateRef, {
+                    created: Date.now(),
+                    theme: initTheme,
+                    maxParticipants: document.getElementById('initMaxPax').value,
+                    totalTimeLimit: document.getElementById('initTotalTime').value,
+                    speakingTimeLimit: baseTime,
+                    teamCount: document.getElementById('initTeams').value,
+                    activeSpeaker: "Floor Open",
+                    activeTeam: "--",
+                    activeSide: "--",
+                    isTimerRunning: false,
+                    endTimeMs: null
+                });
+
+                document.getElementById('displayCode').innerText = currentSessionCode;
+                document.getElementById('themeInput').value = initTheme;
+                document.getElementById('timeMinutes').value = baseTime;
+                
+                document.getElementById('init-state').style.display = 'none';
+                document.getElementById('active-state').style.display = 'block';
+            } catch (error) {
+                alert(`System Error, Sir.\n\nCode: ${error.code}\nMessage: ${error.message}\n\nPlease ensure your Firestore Database is created and set to "Test Mode" in the Firebase Console.`);
+            }
         };
 
         window.updateTheme = async () => {
             const theme = document.getElementById('themeInput').value;
-            if(debateRef) { await updateDoc(debateRef, { theme: theme }); alert("Theme broadcasted globally."); }
+            if(debateRef) { 
+                await updateDoc(debateRef, { theme: theme }); 
+                alert("Theme broadcasted successfully."); 
+            }
         };
 
         window.setSpeaker = async () => {
@@ -200,7 +247,15 @@
         };
 
         window.stopTimer = async () => {
-            if(debateRef) { await updateDoc(debateRef, { isTimerRunning: false, endTimeMs: null, activeSpeaker: "Floor Open", activeTeam: "--", activeSide: "--" }); }
+            if(debateRef) { 
+                await updateDoc(debateRef, { 
+                    isTimerRunning: false, 
+                    endTimeMs: null, 
+                    activeSpeaker: "Floor Open", 
+                    activeTeam: "--", 
+                    activeSide: "--" 
+                }); 
+            }
         };
     </script>
 </body>
