@@ -3,79 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartST DMS - Participant</title>
+    <title>SmartST DMS - Debator Panel</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
-        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15); --danger: #b3261e; --warning: #d97706; }
-        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid var(--border-color); }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; }
-        .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; width: 100%; max-width: 600px; margin: 0 auto; box-sizing: border-box; }
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15); --danger: #b3261e; --success: #16a34a; }
+        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 3rem; border-bottom: 1px solid var(--border-color); background: #fff; z-index: 10;}
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
         
-        /* Registration Form */
-        #registration-state { width: 100%; background: #fff; padding: 3rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
-        h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 2rem; text-align: center; }
-        label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 0.5rem; }
-        input, select { width: 100%; padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 1rem; background: var(--text-color); color: var(--bg-color); border: none; border-radius: 8px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
-        button:hover { opacity: 0.8; }
+        /* Layout */
+        .workspace { display: flex; flex: 1; overflow: hidden; }
+        .main-stage { flex: 2; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--border-color); }
+        .side-panel { flex: 1; display: flex; flex-direction: column; background: #fff; }
+        
+        /* Central Speaker Card */
+        .speaker-card { background: #fff; border: 1px solid var(--border-color); border-radius: 16px; padding: 3rem; width: 100%; max-width: 600px; text-align: center; margin-bottom: 2rem; transition: all 0.5s ease; position: relative; }
+        .timer { font-size: 5rem; font-weight: 300; font-variant-numeric: tabular-nums; transition: color 0.3s; }
+        .timer.danger { color: var(--danger); animation: pulseTimer 1s infinite; }
+        
+        /* Visual Parole Feedback */
+        @keyframes breatheGreen {
+            0% { box-shadow: 0 0 0px rgba(22, 163, 74, 0); border-color: var(--border-color); }
+            50% { box-shadow: inset 0 0 30px rgba(22, 163, 74, 0.1), 0 0 20px rgba(22, 163, 74, 0.2); border-color: var(--success); }
+            100% { box-shadow: 0 0 0px rgba(22, 163, 74, 0); border-color: var(--border-color); }
+        }
+        .is-speaking { animation: breatheGreen 3s infinite ease-in-out; }
 
-        /* Forum View */
-        #forum-state { display: none; width: 100%; text-align: center; }
-        .speaker-card { background: #fff; border: 1px solid var(--border-color); border-radius: 16px; padding: 4rem; margin-bottom: 2rem; }
-        .timer { font-size: 6rem; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.3s; }
-        .timer.danger { color: var(--danger); animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        /* Queue Controls */
+        .queue-box { background: rgba(0,0,0,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; width: 100%; max-width: 600px; text-align: center; }
+        button { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .btn-request { background: var(--text-color); color: var(--bg-color); width: 100%; }
+        .btn-request:hover { opacity: 0.8; }
+        .btn-cancel { background: transparent; border: 1px solid var(--danger); color: var(--danger); width: 100%; }
 
-        /* Warning Overlay */
-        #warning-banner { display: none; background: var(--danger); color: #fff; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; animation: slideDown 0.3s ease-out; }
-        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        /* Side Panel: Notes & Roster */
+        .panel-header { padding: 1rem 2rem; border-bottom: 1px solid var(--border-color); font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; background: #faf9f7; }
+        .roster-list { flex: 1; overflow-y: auto; padding: 1rem 2rem; border-bottom: 1px solid var(--border-color); }
+        .roster-item { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 0.5rem 0; border-bottom: 1px dashed var(--border-color); }
+        .roster-item:last-child { border: none; }
+        
+        .notes-area { flex: 1; display: flex; flex-direction: column; }
+        textarea { flex: 1; border: none; padding: 1.5rem 2rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; resize: none; outline: none; background: #fff; line-height: 1.6; }
+        
+        /* Toasts & Warnings */
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 1rem 2rem; border-radius: 50px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; box-shadow: 0 10px 30px rgba(22,163,74,0.3); }
+        #warning-banner { background: var(--danger); color: white; padding: 1rem; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; display: none; }
+        
+        /* Initialization Screen */
+        #setup-screen { position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--bg-color); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .setup-box { background: #fff; padding: 3rem; border-radius: 16px; border: 1px solid var(--border-color); width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 1rem; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">SmartST.</div>
-        <div id="codeDisplay" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;">Session: ---</div>
-    </nav>
+    <div id="toast">Parole Granted</div>
 
-    <div class="container">
-        
-        <div id="registration-state">
-            <h1>Declare Identity</h1>
-            <label>Full Name</label>
-            <input type="text" id="partName" placeholder="Enter your name">
-            
-            <label>Alignment</label>
+    <div id="setup-screen">
+        <div class="setup-box">
+            <h2 style="font-family: 'Playfair Display', serif; margin-top:0;">Identity Declaration</h2>
+            <input type="text" id="partName" placeholder="Full Name">
             <select id="partSide">
                 <option value="PRO">In Favor (PRO)</option>
                 <option value="CON">Against (CON)</option>
                 <option value="NEUTRAL">Neutral</option>
             </select>
-            
-            <label>Team / Organization (Optional)</label>
-            <input type="text" id="partTeam" placeholder="e.g., EFPRP">
-            
-            <button onclick="registerParticipant()">Enter Forum</button>
+            <input type="text" id="partTeam" placeholder="Team/Org (Optional)">
+            <button class="btn-request" onclick="joinForum()">Enter Forum</button>
         </div>
+    </div>
 
-        <div id="forum-state">
-            <div id="warning-banner">⚠️ MODERATOR WARNING: <span id="warning-text"></span></div>
-            
+    <nav>
+        <div class="logo">SmartST Workspace</div>
+        <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);" id="codeDisplay">Session: ---</div>
+    </nav>
+    <div id="warning-banner">⚠️ MODERATOR WARNING: <span id="warning-text"></span></div>
+
+    <div class="workspace">
+        <div class="main-stage">
             <div style="text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); margin-bottom: 2rem;" id="themeDisplay">Resolution Pending</div>
             
-            <div class="speaker-card">
+            <div class="speaker-card" id="speakerCard">
                 <div style="font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem;" id="teamDisplay">-- | --</div>
-                <h2 style="font-family: 'Playfair Display', serif; font-size: 3rem; margin: 0 0 2rem 0;" id="speakerDisplay">Floor Open</h2>
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 0 0 1.5rem 0;" id="speakerDisplay">Floor Open</h2>
                 <div class="timer" id="timeDisplay">00:00</div>
+            </div>
+
+            <div class="queue-box">
+                <h3 style="margin-top:0; font-family: 'Playfair Display', serif;">Parole Queue</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;" id="queueStatus">You are not in the queue.</p>
+                <button class="btn-request" id="queueBtn" onclick="toggleQueue()">Request Parole</button>
             </div>
         </div>
 
+        <div class="side-panel">
+            <div class="panel-header">Active Forum Roster</div>
+            <div class="roster-list" id="rosterList"></div>
+            
+            <div class="panel-header" style="border-top: 1px solid var(--border-color);">Debator Notes (Auto-saving)</div>
+            <div class="notes-area">
+                <textarea id="debatorNotes" placeholder="Draft your arguments here... Use @Name to reference participants." onkeyup="debounceSaveNotes()"></textarea>
+            </div>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0",
@@ -93,72 +127,129 @@
         const joinCode = urlParams.get('code');
         let participantId = null;
         let timerInterval;
+        let inQueue = false;
+        let noteTimeout;
+        let wasSpeaking = false;
 
         if (joinCode) document.getElementById('codeDisplay').innerText = `Session: ${joinCode}`;
-        else window.location.href = 'index.html';
 
-        window.registerParticipant = async () => {
+        window.joinForum = async () => {
             const name = document.getElementById('partName').value.trim();
-            if (!name) return alert("Sir, your name is required for the official record.");
+            if (!name) return alert("Sir, identity declaration is required.");
             
-            participantId = "PART_" + Date.now() + Math.floor(Math.random() * 1000);
+            participantId = "PART_" + Date.now();
             const pRef = doc(db, "debates", joinCode, "participants", participantId);
             
-            await setDoc(pRef, {
-                name: name,
-                side: document.getElementById('partSide').value,
-                team: document.getElementById('partTeam').value || "--",
-                warning: "",
-                status: "waiting"
-            });
-
-            document.getElementById('registration-state').style.display = 'none';
-            document.getElementById('forum-state').style.display = 'block';
-            
-            initializeListeners();
+            await setDoc(pRef, { name: name, side: document.getElementById('partSide').value, team: document.getElementById('partTeam').value || "--", warning: "", notes: "" });
+            document.getElementById('setup-screen').style.display = 'none';
+            initListeners();
         };
 
-        function initializeListeners() {
-            // Main Debate Listener
-            onSnapshot(doc(db, "debates", joinCode), (docSnap) => {
+        function initListeners() {
+            const debateRef = doc(db, "debates", joinCode);
+            
+            // Global Debate Listener
+            onSnapshot(debateRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     document.getElementById('themeDisplay').innerText = data.theme || "Resolution Pending";
-                    document.getElementById('speakerDisplay').innerText = data.activeSpeaker || "Floor Open";
+                    document.getElementById('speakerDisplay').innerText = data.activeSpeakerName || "Floor Open";
                     document.getElementById('teamDisplay').innerText = `${data.activeSide || "--"} | ${data.activeTeam || "--"}`;
+                    
                     manageTimer(data.endTimeMs, data.isTimerRunning);
+                    updateQueueUI(data.queue || []);
+                    checkParoleStatus(data.activeSpeakerId);
                 }
             });
 
-            // Personal Warning Listener
+            // Participant Roster Listener
+            onSnapshot(collection(db, "debates", joinCode, "participants"), (snapshot) => {
+                const roster = document.getElementById('rosterList');
+                roster.innerHTML = '';
+                snapshot.forEach((doc) => {
+                    const d = doc.data();
+                    roster.innerHTML += `<div class="roster-item"><strong>@${d.name}</strong> <span>${d.side}</span></div>`;
+                });
+            });
+
+            // Personal Document Listener (Warnings & Notes sync)
             onSnapshot(doc(db, "debates", joinCode, "participants", participantId), (docSnap) => {
                 if (docSnap.exists()) {
-                    const data = docSnap.data();
+                    const d = docSnap.data();
                     const banner = document.getElementById('warning-banner');
-                    if (data.warning && data.warning !== "") {
-                        document.getElementById('warning-text').innerText = data.warning;
-                        banner.style.display = 'block';
-                    } else {
-                        banner.style.display = 'none';
-                    }
+                    if (d.warning) { document.getElementById('warning-text').innerText = d.warning; banner.style.display = 'block'; }
+                    else { banner.style.display = 'none'; }
                 }
             });
         }
+
+        function checkParoleStatus(activeId) {
+            const card = document.getElementById('speakerCard');
+            const isMe = (activeId === participantId);
+            
+            if (isMe && !wasSpeaking) {
+                // Just granted parole
+                card.classList.add('is-speaking');
+                showToast();
+                wasSpeaking = true;
+            } else if (!isMe) {
+                card.classList.remove('is-speaking');
+                wasSpeaking = false;
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+        }
+
+        window.toggleQueue = async () => {
+            const debateRef = doc(db, "debates", joinCode);
+            if (inQueue) {
+                await updateDoc(debateRef, { queue: arrayRemove(participantId) });
+            } else {
+                await updateDoc(debateRef, { queue: arrayUnion(participantId) });
+            }
+        };
+
+        function updateQueueUI(queueArray) {
+            const idx = queueArray.indexOf(participantId);
+            const btn = document.getElementById('queueBtn');
+            const status = document.getElementById('queueStatus');
+            
+            if (idx !== -1) {
+                inQueue = true;
+                btn.innerText = "Revoke Parole Request";
+                btn.className = "btn-cancel";
+                status.innerHTML = `You are in the queue. <strong>${idx} participant(s)</strong> ahead of you.`;
+            } else {
+                inQueue = false;
+                btn.innerText = "Request Parole";
+                btn.className = "btn-request";
+                status.innerText = `You are not in the queue. Total waiting: ${queueArray.length}`;
+            }
+        }
+
+        window.debounceSaveNotes = () => {
+            clearTimeout(noteTimeout);
+            noteTimeout = setTimeout(async () => {
+                const text = document.getElementById('debatorNotes').value;
+                await updateDoc(doc(db, "debates", joinCode, "participants", participantId), { notes: text });
+            }, 1000);
+        };
 
         function manageTimer(endTimeMs, isRunning) {
             clearInterval(timerInterval);
             const display = document.getElementById('timeDisplay');
             if (!isRunning || !endTimeMs) { display.classList.remove('danger'); display.innerText = "00:00"; return; }
-
             timerInterval = setInterval(() => {
-                const remainingMs = endTimeMs - Date.now();
-                if (remainingMs <= 0) {
-                    clearInterval(timerInterval); display.innerText = "00:00"; display.classList.add('danger');
-                } else {
-                    const minutes = Math.floor(remainingMs / 60000);
-                    const seconds = Math.floor((remainingMs % 60000) / 1000);
-                    display.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    if (remainingMs < 15000) display.classList.add('danger'); else display.classList.remove('danger');
+                const r = endTimeMs - Date.now();
+                if (r <= 0) { clearInterval(timerInterval); display.innerText = "00:00"; display.classList.add('danger'); }
+                else {
+                    const m = Math.floor(r / 60000); const s = Math.floor((r % 60000) / 1000);
+                    display.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    if (r < 15000) display.classList.add('danger'); else display.classList.remove('danger');
                 }
             }, 100);
         }
