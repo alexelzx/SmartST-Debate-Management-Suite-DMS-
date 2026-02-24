@@ -93,9 +93,32 @@
     </div>
 
     <script type="module">
+        // Add this to the top of your host.html script block
+const urlParams = new URLSearchParams(window.location.search);
+const isModJoin = urlParams.get('role') === 'moderator';
+const sessionParam = urlParams.get('code');
+
+onAuthStateChanged(auth, (user) => {
+    // If NOT a host and NOT a verified moderator with a PIN, redirect
+    const hasModPermission = localStorage.getItem(`mod_auth_${sessionParam}`) === "true";
+    if (!user && !hasModPermission) { 
+        window.location.href = "auth.html"; 
+    }
+    
+    // If it's a moderator joining an existing session
+    if (isModJoin && sessionParam) {
+        currentSessionCode = sessionParam;
+        debateRef = doc(db, "debates", currentSessionCode);
+        document.getElementById('displayCode').innerText = currentSessionCode;
+        document.getElementById('init-state').style.display = 'none';
+        document.getElementById('active-state').style.display = 'block';
+        initSync();
+    }
+});
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot, arrayRemove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        
 
         const firebaseConfig = {
             apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0",
@@ -256,3 +279,4 @@
     </script>
 </body>
 </html>
+
