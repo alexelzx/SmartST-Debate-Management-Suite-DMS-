@@ -6,147 +6,109 @@
     <title>SmartST DMS - Portal</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
-
-        :root {
-            --bg-color: #F4F2ED;
-            --text-color: #1C1C1C;
-            --text-muted: #666666;
-            --border-color: rgba(28, 28, 28, 0.15);
-        }
-
-        body {
-            margin: 0; background-color: var(--bg-color); color: var(--text-color);
-            font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased;
-            display: flex; min-height: 100vh;
-        }
-
-        /* Split Layout */
-        .portal-side {
-            width: 45%; padding: 3rem 4rem; display: flex; flex-direction: column;
-            box-sizing: border-box; position: relative; z-index: 10;
-        }
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15); }
+        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; display: flex; min-height: 100vh; }
         
-        .visual-side {
-            width: 55%; position: relative; display: flex; align-items: flex-end; justify-content: center;
-            padding: 4rem; box-sizing: border-box;
-            background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
-            background-size: cover;
-        }
+        /* Layout */
+        .portal-side { width: 45%; padding: 3rem 4rem; display: flex; flex-direction: column; box-sizing: border-box; }
+        .visual-side { width: 55%; background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop') no-repeat center center; background-size: cover; display: flex; align-items: flex-end; padding: 4rem; box-sizing: border-box; }
 
-        /* Form Elements */
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.5px; cursor: pointer; }
-        
         .form-container { margin: auto; width: 100%; max-width: 380px; }
-        h1 { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 400; margin: 0 0 0.5rem 0; line-height: 1.1; letter-spacing: -1px; }
-        .subtitle { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 2.5rem; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 400; margin-bottom: 0.5rem; letter-spacing: -1px; }
+        p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 2rem; }
 
-        input {
-            width: 100%; padding: 1.2rem; margin-bottom: 1.5rem;
-            border: 1px solid var(--border-color); border-radius: 8px;
-            background: transparent; font-family: 'Inter', sans-serif; font-size: 1rem;
-            text-align: center; letter-spacing: 4px; text-transform: uppercase;
-            box-sizing: border-box; outline: none; transition: border-color 0.3s;
-        }
-        input:focus { border-color: var(--text-color); }
-
-        button {
-            width: 100%; padding: 1.2rem; border: none; border-radius: 8px;
-            font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.3s;
-        }
-        .btn-primary { background: var(--text-color); color: var(--bg-color); margin-bottom: 1rem; }
-        .btn-primary:hover { opacity: 0.8; transform: translateY(-1px); }
-        
+        input { width: 100%; padding: 1.1rem; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: #fff; font-family: 'Inter', sans-serif; text-align: center; letter-spacing: 2px; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 1.1rem; border: none; border-radius: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.3s; margin-top: 0.5rem; }
+        .btn-primary { background: var(--text-color); color: var(--bg-color); }
         .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
-        .btn-outline:hover { background: rgba(0,0,0,0.03); border-color: var(--text-color); }
-
-        .divider {
-            display: flex; align-items: center; margin: 2rem 0; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px;
-        }
+        
+        .divider { display: flex; align-items: center; margin: 1.5rem 0; color: var(--text-muted); font-size: 0.7rem; letter-spacing: 2px; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
         .divider span { padding: 0 1rem; }
 
-        /* Carousel Panel */
-        .tips-panel {
-            background: rgba(244, 242, 237, 0.95); backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color); border-radius: 16px;
-            padding: 2.5rem; width: 100%; max-width: 500px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            position: relative; height: 180px; overflow: hidden;
-        }
-        .tip-card {
-            position: absolute; top: 2.5rem; left: 2.5rem; right: 2.5rem;
-            opacity: 0; transform: translateY(10px); transition: all 0.6s ease;
-            pointer-events: none;
-        }
-        .tip-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        
-        .tip-quote { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-style: italic; margin-bottom: 1rem; color: var(--text-color); }
-        .tip-author { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
-
-        @media (max-width: 900px) {
-            body { flex-direction: column; }
-            .portal-side, .visual-side { width: 100%; }
-            .visual-side { min-height: 500px; padding: 2rem; }
-        }
+        #mod-auth-box { display: none; border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="portal-side">
-        <div class="logo" onclick="window.location.href='main.html'">SmartST.</div>
+        <div style="font-family: 'Playfair Display', serif; font-weight: 600; cursor: pointer;" onclick="window.location.href='main.html'">SmartST.</div>
+        
         <div class="form-container">
-            <h1>Participant</h1>
-            <p class="subtitle">Enter your session identifier to join the forum.</p>
+            <h1>Access Portal</h1>
+            <p>Connect to an active discourse environment.</p>
             
-            <input type="text" id="joinCode" placeholder="SESSION CODE" maxlength="6" autocomplete="off">
-            <button class="btn-primary" onclick="joinAsParticipant()">Join Debate</button>
+            <input type="text" id="joinCode" placeholder="6-DIGIT SESSION CODE" maxlength="6">
+            <button class="btn-primary" onclick="routeUser('participant.html')">Join as Debator</button>
             
-            <div class="divider"><span>OR</span></div>
+            <div class="divider"><span>MANAGEMENT</span></div>
             
-            <button class="btn-outline" onclick="window.location.href='auth.html'">Host Authentication</button>
+            <button class="btn-outline" onclick="showModAuth()">Moderator Access</button>
+            
+            <div id="mod-auth-box">
+                <input type="password" id="modPin" placeholder="4-DIGIT MODERATOR PIN" maxlength="4">
+                <button class="btn-primary" onclick="verifyModAccess()">Authenticate Moderator</button>
+            </div>
+
+            <div class="divider"><span>ADMINISTRATION</span></div>
+            <button class="btn-outline" onclick="window.location.href='auth.html'">Host Login</button>
         </div>
     </div>
 
     <div class="visual-side">
-        <div class="tips-panel">
-            <div class="tip-card active">
-                <div class="tip-quote">"Don't raise your voice, improve your argument."</div>
-                <div class="tip-author">— Desmond Tutu</div>
-            </div>
-            <div class="tip-card">
-                <div class="tip-quote">"He who knows only his own side of the case knows little of that."</div>
-                <div class="tip-author">— John Stuart Mill</div>
-            </div>
-            <div class="tip-card">
-                <div class="tip-quote">"The supreme art of war is to subdue the enemy without fighting."</div>
-                <div class="tip-author">— Sun Tzu</div>
-            </div>
-            <div class="tip-card">
-                <div class="tip-quote">"Truth is born into this world only with pangs and tribulations."</div>
-                <div class="tip-author">— Alfred North Whitehead</div>
-            </div>
+        <div style="background: rgba(255,255,255,0.9); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); max-width: 400px; backdrop-filter: blur(10px);">
+            <div style="font-family: 'Playfair Display', serif; font-style: italic; margin-bottom: 0.5rem;">"Concision is the ultimate expression of authority."</div>
+            <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">— SmartST Discourse Protocol</div>
         </div>
     </div>
 
-    <script>
-        // Carousel Logic
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.tip-card');
-        setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 5000);
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-        function joinAsParticipant() {
+        const firebaseConfig = {
+            apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0",
+            authDomain: "smartst-debate.firebaseapp.com",
+            projectId: "smartst-debate",
+            storageBucket: "smartst-debate.firebasestorage.app",
+            messagingSenderId: "128238171772",
+            appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.routeUser = (page) => {
             const code = document.getElementById('joinCode').value.trim().toUpperCase();
-            if (code.length === 6) {
-                window.location.href = `participant.html?code=${code}`;
-            } else {
-                alert("Sir, please enter a valid 6-character session code.");
+            if (code.length === 6) window.location.href = `${page}?code=${code}`;
+            else alert("Sir, please provide the 6-character session code.");
+        };
+
+        window.showModAuth = () => {
+            document.getElementById('mod-auth-box').style.display = 'block';
+        };
+
+        window.verifyModAccess = async () => {
+            const code = document.getElementById('joinCode').value.trim().toUpperCase();
+            const pin = document.getElementById('modPin').value.trim();
+            
+            if (code.length !== 6 || pin.length !== 4) {
+                alert("Sir, complete credentials are required for moderator elevation.");
+                return;
             }
-        }
+
+            const docRef = doc(db, "debates", code);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists() && docSnap.data().modPin === pin) {
+                // Correct PIN: Store a temporary session permission in localStorage
+                localStorage.setItem(`mod_auth_${code}`, "true");
+                window.location.href = `host.html?code=${code}&role=moderator`;
+            } else {
+                alert("Authentication failed. The Moderator PIN is incorrect for this session.");
+            }
+        };
     </script>
 </body>
 </html>
