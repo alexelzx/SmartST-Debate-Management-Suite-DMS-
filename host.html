@@ -2,242 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartST DMS - Executive Host</title>
+    <title>SmartST - Executive Host</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
-        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --text-muted: #666666; --border-color: rgba(28, 28, 28, 0.15); --danger: #b3261e; --success: #16a34a; }
-        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; min-height: 100vh; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 3rem; border-bottom: 1px solid var(--border-color); background: #fff; position: sticky; top: 0; z-index: 100; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
-        .dashboard-container { max-width: 1400px; margin: 3rem auto; padding: 0 2rem; }
-        
-        button { padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: var(--text-color); color: var(--bg-color); }
-        .btn-primary:hover { opacity: 0.8; }
-        .btn-outline { background: transparent; border: 1px solid var(--text-color); color: var(--text-color); }
-        .btn-success { background: var(--success); color: #fff; }
-        
-        .panel { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0 0 1.5rem 0; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
-        
-        .grid-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; }
-        #init-state { max-width: 600px; margin: 0 auto; text-align: center; }
-        #active-state { display: none; }
-        input { width: 100%; padding: 1rem; margin-bottom: 1rem; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Inter', sans-serif; box-sizing: border-box; }
-
-        .roster-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; background: #faf9f7;}
-        .queue-badge { font-size: 0.7rem; background: var(--text-color); color: var(--bg-color); padding: 0.2rem 0.6rem; border-radius: 50px; text-transform: uppercase; margin-left: 1rem; }
-        .action-group { display: flex; gap: 0.5rem; }
-
-        .log-container { background: #1e1e1e; color: #a3a3a3; padding: 1.5rem; border-radius: 8px; font-family: monospace; font-size: 0.8rem; height: 400px; overflow-y: auto; }
-        .log-entry { margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem; }
-        .log-time { color: #818cf8; margin-right: 0.5rem; }
-        .log-action { color: #fff; font-weight: bold; }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@400;600&display=swap');
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-color); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        nav { padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; display: flex; justify-content: space-between; align-items: center; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .panel { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; }
+        .log-box { background: #1e1e1e; color: #a3a3a3; font-family: monospace; padding: 1rem; height: 300px; overflow-y: auto; border-radius: 8px; font-size: 0.8rem; }
+        .participant-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border); }
+        button { padding: 0.6rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+        .btn-grant { background: var(--success); color: #fff; }
+        .btn-warn { background: var(--danger); color: #fff; }
+        .btn-clear { background: #666; color: #fff; }
     </style>
 </head>
 <body>
-
-    <nav>
-        <div class="logo">SmartST Executive Host</div>
-        <div style="display: flex; gap: 1rem;">
-            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">Broadcast TV View</button>
-            <button class="btn-outline" onclick="handleLogout()">End Session</button>
+    <nav><div style="font-family:'Playfair Display',serif; font-weight:600;">SmartST Host</div><div id="sessionCodeDisplay">---</div></nav>
+    <div class="container">
+        <div class="panel">
+            <h3>Roster & Parole Control</h3>
+            <div id="participantList"></div>
         </div>
-    </nav>
-
-    <div class="dashboard-container">
-        <div id="init-state" class="panel">
-            <h2>Initialize Framework</h2>
-            <input type="text" id="initTheme" placeholder="Resolution / Theme">
-            <input type="number" id="baseTimer" placeholder="Default Speaker Timer (Min)" value="5">
-            <button class="btn-primary" style="width: 100%;" onclick="generateSession()">Deploy Secure Environment</button>
-        </div>
-
-        <div id="active-state">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: #fff; padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                <div>
-                    <h1 style="font-family: 'Playfair Display', serif; margin:0;">Command Center</h1>
-                    <div style="color: var(--text-muted);">Currently Speaking: <strong id="currentSpeakerLabel" style="color:var(--text-color);">None</strong></div>
-                </div>
-                <div style="text-align: right;">
-                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Session Code</div>
-                    <div style="font-size: 2.5rem; font-weight: 600; letter-spacing: 4px;" id="displayCode">------</div>
-                    <div style="font-size: 0.8rem; color: var(--danger); font-weight: bold; text-transform: uppercase; margin-top: 0.5rem;">Moderator PIN: <span id="displayPin">----</span></div>
-                </div>
-            </div>
-
-            <div class="grid-layout">
-                <div class="panel">
-                    <h3>Active Roster & Queue</h3>
-                    <div style="margin-bottom: 1rem;">
-                        <input type="number" id="manualTimer" placeholder="Minutes" style="width: 100px; display: inline-block; margin: 0 1rem 0 0;">
-                        <button class="btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="revokeFloor()">Halt Floor</button>
-                    </div>
-                    <div id="participantList"></div>
-                </div>
-
-                <div class="panel">
-                    <h3>Precision Event Log</h3>
-                    <div class="log-container" id="eventLog"></div>
-                </div>
-            </div>
+        <div class="panel">
+            <h3>Executive Audit Log</h3>
+            <div class="log-box" id="fullLog"></div>
         </div>
     </div>
 
     <script type="module">
-        // 1. Correct Import Order
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot, arrayRemove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, collection, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0",
-            authDomain: "smartst-debate.firebaseapp.com",
-            projectId: "smartst-debate",
-            storageBucket: "smartst-debate.firebasestorage.app",
-            messagingSenderId: "128238171772",
-            appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0", authDomain: "smartst-debate.firebaseapp.com", projectId: "smartst-debate", storageBucket: "smartst-debate.firebasestorage.app", messagingSenderId: "128238171772", appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9" };
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
-        
         const urlParams = new URLSearchParams(window.location.search);
-        const isModJoin = urlParams.get('role') === 'moderator';
-        const sessionParam = urlParams.get('code');
-        
-        let sessionCode = null;
-        let pData = {};
-        let currentQueue = [];
+        const sessionCode = urlParams.get('code');
+        let participants = {};
 
-        // 2. Security & Role Check
-        onAuthStateChanged(auth, (user) => {
-            const hasModPermission = localStorage.getItem(`mod_auth_${sessionParam}`) === "true";
-            if (!user && !hasModPermission) { 
-                window.location.href = "auth.html"; 
-                return;
-            }
-            
-            if (isModJoin && sessionParam) {
-                sessionCode = sessionParam;
-                document.getElementById('displayCode').innerText = sessionCode;
-                document.getElementById('init-state').style.display = 'none';
-                document.getElementById('active-state').style.display = 'block';
-                document.getElementById('tvBtn').style.display = 'block';
-                initSync();
-            }
-        });
-
-        window.handleLogout = () => signOut(auth).then(() => window.location.href = "index.html");
-        window.launchTV = () => window.open(`tv.html?code=${sessionCode}`, 'Projector', 'width=1280,height=720');
-
-        function appendLog(action, detail) {
-            const logBox = document.getElementById('eventLog');
-            const time = new Date().toLocaleTimeString();
-            const entry = `<div class="log-entry"><span class="log-time">[${time}]</span> <span class="log-action">${action}</span><br>↳ ${detail}</div>`;
-            logBox.innerHTML = entry + logBox.innerHTML;
+        if(sessionCode) {
+            document.getElementById('sessionCodeDisplay').innerText = `Session: ${sessionCode}`;
+            initSync();
         }
 
-        // 3. The Core Functional Block
-        window.generateSession = async () => {
-            try {
-                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                let code = ''; for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-                let pin = Math.floor(1000 + Math.random() * 9000).toString();
-                
-                sessionCode = code;
-                const docRef = doc(db, "debates", sessionCode);
-                
-                await setDoc(docRef, {
-                    created: Date.now(),
-                    theme: document.getElementById('initTheme').value || "General Debate",
-                    modPin: pin,
-                    queue: [],
-                    activeSpeakerId: null,
-                    activeSpeakerName: "Floor Open",
-                    activeTeam: "--",
-                    activeSide: "--",
-                    isTimerRunning: false,
-                    endTimeMs: null
-                });
-
-                document.getElementById('displayCode').innerText = sessionCode;
-                document.getElementById('displayPin').innerText = pin;
-                document.getElementById('init-state').style.display = 'none';
-                document.getElementById('active-state').style.display = 'block';
-                document.getElementById('tvBtn').style.display = 'block';
-
-                appendLog("SYSTEM INITIALIZED", `Code: ${code} | PIN: ${pin}`);
-                initSync();
-            } catch (err) {
-                alert(`Execution Failed: ${err.message}. Sir, please ensure Firestore Rules are published.`);
-            }
-        };
+        function appendLog(action) {
+            const time = new Date().toLocaleTimeString();
+            const log = document.getElementById('fullLog');
+            log.innerHTML = `<div>[${time}] ${action}</div>` + log.innerHTML;
+        }
 
         function initSync() {
-            onSnapshot(doc(db, "debates", sessionCode), (docSnap) => {
-                if (docSnap.exists()) {
-                    currentQueue = docSnap.data().queue || [];
-                    renderRoster();
-                }
-            });
-            onSnapshot(collection(db, "debates", sessionCode, "participants"), (snapshot) => {
-                snapshot.forEach((doc) => { pData[doc.id] = doc.data(); });
-                renderRoster();
+            onSnapshot(collection(db, "debates", sessionCode, "participants"), (snap) => {
+                const list = document.getElementById('participantList');
+                list.innerHTML = '';
+                snap.forEach(d => {
+                    const data = d.data(); participants[d.id] = data;
+                    list.innerHTML += `
+                        <div class="participant-row">
+                            <div><strong>${data.name}</strong><br><small>${data.side}</small></div>
+                            <div>
+                                <button class="btn-grant" onclick="grantParole('${d.id}')">Grant</button>
+                                <button class="btn-warn" onclick="issueWarn('${d.id}')">Warn</button>
+                                <button class="btn-clear" onclick="clearWarn('${d.id}')">Clear</button>
+                            </div>
+                        </div>`;
+                });
             });
         }
 
-        function renderRoster() {
-            const listDiv = document.getElementById('participantList');
-            listDiv.innerHTML = '';
-            let renderedIds = new Set();
-            currentQueue.forEach((pid, idx) => {
-                if(pData[pid]) { listDiv.appendChild(createRow(pid, pData[pid], idx + 1)); renderedIds.add(pid); }
-            });
-            for (let pid in pData) { if (!renderedIds.has(pid)) listDiv.appendChild(createRow(pid, pData[pid], null)); }
-        }
-
-        function createRow(pid, data, qPos) {
-            const row = document.createElement('div');
-            row.className = 'roster-row';
-            let badge = qPos ? `<span class="queue-badge">Q#${qPos}</span>` : '';
-            row.innerHTML = `<div><strong>${data.name}${badge}</strong><br><small>${data.side} | ${data.team}</small></div>
-                <div class="action-group">
-                    <button class="btn-success" onclick="grantFloor('${pid}')">Parole</button>
-                    <button class="btn-outline" style="border-color:var(--danger); color:var(--danger);" onclick="issueWarning('${pid}')">Warn</button>
-                </div>`;
-            return row;
-        }
-
-        window.grantFloor = async (pid) => {
-            const p = pData[pid];
-            const minutes = parseInt(document.getElementById('manualTimer').value) || parseInt(document.getElementById('baseTimer').value);
-            const endTimeMs = Date.now() + (minutes * 60000);
+        window.grantParole = async (pid) => {
+            const p = participants[pid];
             await updateDoc(doc(db, "debates", sessionCode), {
-                activeSpeakerId: pid, activeSpeakerName: p.name, activeTeam: p.team, activeSide: p.side,
-                endTimeMs: endTimeMs, isTimerRunning: true, queue: arrayRemove(pid)
+                activeSpeakerId: pid, activeSpeakerName: p.name, activeSide: p.side,
+                isTimerRunning: true, endTimeMs: Date.now() + 300000, queue: arrayRemove(pid)
             });
-            document.getElementById('currentSpeakerLabel').innerText = p.name;
-            appendLog("PAROLE GRANTED", `${p.name} | ${minutes}m`);
+            await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { history: arrayUnion(`Parole granted at ${new Date().toLocaleTimeString()}`) });
+            appendLog(`PAROLE GRANTED: ${p.name}`);
         };
 
-        window.revokeFloor = async () => {
-            await updateDoc(doc(db, "debates", sessionCode), { 
-                isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open", activeTeam: "--", activeSide: "--" 
-            });
-            document.getElementById('currentSpeakerLabel').innerText = "None";
-            appendLog("FLOOR REVOKED", "Moderator intervention.");
-        };
-
-        window.issueWarning = async (pid) => {
-            const msg = prompt("Enter specific warning:");
+        window.issueWarn = async (pid) => {
+            const msg = prompt("Warning directive:");
             if(msg) {
-                await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: msg });
-                appendLog("WARNING", `${pData[pid].name}: ${msg}`);
-                setTimeout(() => updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: "" }), 10000);
+                await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: msg, history: arrayUnion(`Warned: ${msg}`) });
+                appendLog(`WARNING ISSUED: ${participants[pid].name} - ${msg}`);
             }
+        };
+
+        window.clearWarn = async (pid) => {
+            await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: "" });
+            appendLog(`WARNING CLEARED: ${participants[pid].name}`);
         };
     </script>
 </body>
