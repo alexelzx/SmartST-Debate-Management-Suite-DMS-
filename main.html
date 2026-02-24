@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartST DMS - Executive Debate Management</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-color: #F4F2ED;
+            --text-color: #1C1C1C;
+            --text-muted: #555555;
+            --border-color: rgba(28, 28, 28, 0.15);
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 4rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.5rem; 
+            font-weight: 600; 
+            letter-spacing: -0.5px; 
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover { opacity: 0.6; }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 4rem 4rem 4rem;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif; 
+            font-size: 5rem; 
+            font-weight: 400;
+            line-height: 1.1; 
+            margin: 0 0 1.5rem 0; 
+            letter-spacing: -1.5px;
+        }
+
+        h1 i { color: #555; }
+
+        .subtitle { 
+            font-size: 1.1rem; 
+            color: var(--text-muted); 
+            font-weight: 300; 
+            margin: 0 auto 3rem auto;
+            max-width: 700px;
+        }
+
+        /* Tree Image */
+        .image-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 4rem auto;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            object-position: center 60%;
+            display: block;
+            transition: transform 0.7s ease;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.03);
+        }
+
+        /* Unified Access Action */
+        .access-container {
+            text-align: center;
+            margin-bottom: 6rem;
+        }
+
+        .btn-launch {
+            background: var(--text-color);
+            color: var(--bg-color);
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.3s;
+        }
+
+        .btn-launch:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Two-Column Info Section */
+        .info-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 4rem;
+            max-width: 1200px; 
+            margin: 0 auto 4rem auto; 
+            padding: 4rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .info-card h2 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 2rem; 
+            margin-top: 0; 
+        }
+        
+        .info-card p { 
+            color: var(--text-muted); 
+            font-weight: 300; 
+            font-size: 1.05rem; 
+        }
+
+        /* Tips Section */
+        .tips-section { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 4rem; 
+            border-top: 1px solid var(--border-color); 
+        }
+
+        .tips-section h2 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 2.5rem; 
+            text-align: center; 
+            margin-bottom: 3rem; 
+        }
+
+        .tips-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 2rem; 
+        }
+
+        .tip-card {
+            background: transparent; 
+            border: 1px solid var(--border-color);
+            padding: 2.5rem; 
+            border-radius: 12px; 
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .tip-card:hover { 
+            transform: translateY(-5px); 
+            background: #ffffff; 
+        }
+
+        .tip-quote { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.2rem; 
+            font-style: italic; 
+            margin-bottom: 1.5rem; 
+        }
+
+        .tip-author { 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-color); 
+            padding: 3rem 4rem;
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 0.85rem;
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+
+        .footer-links a { 
+            color: inherit; 
+            text-decoration: none; 
+            margin-left: 2rem; 
+            transition: color 0.2s; 
+        }
+
+        .footer-links a:hover { 
+            color: var(--text-color); 
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 3.5rem; }
+            .info-grid { grid-template-columns: 1fr; gap: 2rem; padding: 2rem; }
+            .nav-links { display: none; }
+            footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+            .footer-links a { margin: 0 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">SmartST DMS.</div>
+        <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#insights">Insights</a>
+            <a href="index.html">Access Portal</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Elevating <i>Discourse</i><br>to an Art Form.</h1>
+        <p class="subtitle">A structured, low-latency architecture designed for executive communication, rigorous debate, and objective analysis.</p>
+    </section>
+
+    <div class="image-container">
+        <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop" alt="Minimalist Lone Tree">
+    </div>
+
+    <div class="access-container">
+        <button class="btn-launch" onclick="window.location.href='index.html'">Launch SmartST Debate Login</button>
+    </div>
+
+    <section id="about" class="info-grid">
+        <div class="info-card">
+            <h2>System Architecture</h2>
+            <p>The SmartST Debate Management Suite (DMS) eliminates the administrative friction of structured argumentation. By synchronizing cross-device chronometry through cloud infrastructure, it ensures absolute fairness, precise speaking intervals, and undeniable clarity for all participants.</p>
+        </div>
+        
+        <div class="info-card">
+            <h2>Development Pedigree</h2>
+            <p>Architected by an Information-Communication scholar based in Toulouse, SmartST DMS represents the synthesis of digital latency control and advanced rhetorical theory. It bridges the gap between technical infrastructure and human intellectual exchange.</p>
+        </div>
+    </section>
+
+    <section id="insights" class="tips-section">
+        <h2>Strategic Insights</h2>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-quote">"Don't raise your voice, improve your argument."</div>
+                <div class="tip-author">— Desmond Tutu</div>
+            </div>
+            <div class="tip-card">
+                <div class="tip-quote">"He who knows only his own side of the case knows little of that. His reasons may be good, and no one may have been able to refute them."</div>
+                <div class="tip-author">— John Stuart Mill</div>
+            </div>
+            <div class="tip-card">
+                <div class="tip-quote">"The supreme art of war is to subdue the enemy without fighting."</div>
+                <div class="tip-author">— Sun Tzu</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div>&copy; 2026 SmartST DMS. All Rights Reserved.</div>
+        <div class="footer-links">
+            <a href="#tos">Terms of Service</a>
+            <a href="#privacy">Privacy Policy</a>
+        </div>
+    </footer>
+
+</body>
+</html>

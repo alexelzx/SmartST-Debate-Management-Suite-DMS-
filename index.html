@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartST DMS - Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-color: #F4F2ED;
+            --text-color: #1C1C1C;
+            --text-muted: #666666;
+            --border-color: rgba(28, 28, 28, 0.15);
+        }
+
+        body {
+            margin: 0; background-color: var(--bg-color); color: var(--text-color);
+            font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased;
+            display: flex; min-height: 100vh;
+        }
+
+        /* Split Layout */
+        .portal-side {
+            width: 45%; padding: 3rem 4rem; display: flex; flex-direction: column;
+            box-sizing: border-box; position: relative; z-index: 10;
+        }
+        
+        .visual-side {
+            width: 55%; position: relative; display: flex; align-items: flex-end; justify-content: center;
+            padding: 4rem; box-sizing: border-box;
+            background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
+            background-size: cover;
+        }
+
+        /* Form Elements */
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.5px; cursor: pointer; }
+        
+        .form-container { margin: auto; width: 100%; max-width: 380px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 400; margin: 0 0 0.5rem 0; line-height: 1.1; letter-spacing: -1px; }
+        .subtitle { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 2.5rem; }
+
+        input {
+            width: 100%; padding: 1.2rem; margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            background: transparent; font-family: 'Inter', sans-serif; font-size: 1rem;
+            text-align: center; letter-spacing: 4px; text-transform: uppercase;
+            box-sizing: border-box; outline: none; transition: border-color 0.3s;
+        }
+        input:focus { border-color: var(--text-color); }
+
+        button {
+            width: 100%; padding: 1.2rem; border: none; border-radius: 8px;
+            font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-primary { background: var(--text-color); color: var(--bg-color); margin-bottom: 1rem; }
+        .btn-primary:hover { opacity: 0.8; transform: translateY(-1px); }
+        
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); }
+        .btn-outline:hover { background: rgba(0,0,0,0.03); border-color: var(--text-color); }
+
+        .divider {
+            display: flex; align-items: center; margin: 2rem 0; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 2px;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
+        .divider span { padding: 0 1rem; }
+
+        /* Carousel Panel */
+        .tips-panel {
+            background: rgba(244, 242, 237, 0.95); backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color); border-radius: 16px;
+            padding: 2.5rem; width: 100%; max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative; height: 180px; overflow: hidden;
+        }
+        .tip-card {
+            position: absolute; top: 2.5rem; left: 2.5rem; right: 2.5rem;
+            opacity: 0; transform: translateY(10px); transition: all 0.6s ease;
+            pointer-events: none;
+        }
+        .tip-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        
+        .tip-quote { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-style: italic; margin-bottom: 1rem; color: var(--text-color); }
+        .tip-author { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
+
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .portal-side, .visual-side { width: 100%; }
+            .visual-side { min-height: 500px; padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-side">
+        <div class="logo" onclick="window.location.href='main.html'">SmartST.</div>
+        <div class="form-container">
+            <h1>Participant</h1>
+            <p class="subtitle">Enter your session identifier to join the forum.</p>
+            
+            <input type="text" id="joinCode" placeholder="SESSION CODE" maxlength="6" autocomplete="off">
+            <button class="btn-primary" onclick="joinAsParticipant()">Join Debate</button>
+            
+            <div class="divider"><span>OR</span></div>
+            
+            <button class="btn-outline" onclick="window.location.href='auth.html'">Host Authentication</button>
+        </div>
+    </div>
+
+    <div class="visual-side">
+        <div class="tips-panel">
+            <div class="tip-card active">
+                <div class="tip-quote">"Don't raise your voice, improve your argument."</div>
+                <div class="tip-author">— Desmond Tutu</div>
+            </div>
+            <div class="tip-card">
+                <div class="tip-quote">"He who knows only his own side of the case knows little of that."</div>
+                <div class="tip-author">— John Stuart Mill</div>
+            </div>
+            <div class="tip-card">
+                <div class="tip-quote">"The supreme art of war is to subdue the enemy without fighting."</div>
+                <div class="tip-author">— Sun Tzu</div>
+            </div>
+            <div class="tip-card">
+                <div class="tip-quote">"Truth is born into this world only with pangs and tribulations."</div>
+                <div class="tip-author">— Alfred North Whitehead</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Carousel Logic
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.tip-card');
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 5000);
+
+        function joinAsParticipant() {
+            const code = document.getElementById('joinCode').value.trim().toUpperCase();
+            if (code.length === 6) {
+                window.location.href = `participant.html?code=${code}`;
+            } else {
+                alert("Sir, please enter a valid 6-character session code.");
+            }
+        }
+    </script>
+</body>
+</html>
