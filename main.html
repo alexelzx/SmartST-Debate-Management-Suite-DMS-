@@ -14,6 +14,8 @@
             --border-color: rgba(28, 28, 28, 0.15);
         }
 
+        html { scroll-behavior: smooth; }
+
         body {
             margin: 0;
             background-color: var(--bg-color);
@@ -21,66 +23,93 @@
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
+        /* --- Animations & Serenity --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.2s cubic-bezier(0.25, 1, 0.2, 1), transform 1.2s cubic-bezier(0.25, 1, 0.2, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+
+        @keyframes gentleFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Navigation */
         nav { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; border-bottom: 1px solid var(--border-color); }
         .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.5px; }
         .nav-links { display: flex; gap: 2.5rem; }
-        .nav-links a { text-decoration: none; color: var(--text-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.3s; }
-        .nav-links a:hover { opacity: 0.6; }
+        .nav-links a { text-decoration: none; color: var(--text-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.4s ease; }
+        .nav-links a:hover { opacity: 0.5; }
 
-        .hero { padding: 6rem 4rem 4rem 4rem; text-align: center; max-width: 1000px; margin: 0 auto; }
+        /* Hero Section */
+        .hero { padding: 8rem 4rem 4rem 4rem; text-align: center; max-width: 1000px; margin: 0 auto; }
         h1 { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 400; line-height: 1.1; margin: 0 0 1.5rem 0; letter-spacing: -1.5px; }
-        h1 i { color: #555; }
-        .subtitle { font-size: 1.1rem; color: var(--text-muted); font-weight: 300; margin: 0 auto 3rem auto; max-width: 700px; }
+        h1 i { color: #666; }
+        .subtitle { font-size: 1.15rem; color: var(--text-muted); font-weight: 300; margin: 0 auto 3rem auto; max-width: 700px; line-height: 1.8; }
 
-        .image-container { width: 100%; max-width: 1200px; margin: 0 auto 4rem auto; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
-        .image-container img { width: 100%; height: 500px; object-fit: cover; object-position: center 60%; display: block; transition: transform 0.7s ease; }
-        .image-container:hover img { transform: scale(1.03); }
+        /* Image Display */
+        .image-wrapper { animation: gentleFloat 8s ease-in-out infinite; width: 100%; max-width: 1200px; margin: 0 auto 4rem auto; }
+        .image-container { border-radius: 24px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.08); transform: translateZ(0); }
+        .image-container img { width: 100%; height: 550px; object-fit: cover; object-position: center 60%; display: block; transition: transform 1.5s cubic-bezier(0.25, 1, 0.2, 1); }
+        .image-container:hover img { transform: scale(1.04); }
 
-        .access-container { text-align: center; margin-bottom: 6rem; }
-        .btn-launch { background: var(--text-color); color: var(--bg-color); padding: 1.2rem 3rem; border: none; border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: transform 0.2s, opacity 0.3s; }
-        .btn-launch:hover { opacity: 0.9; transform: translateY(-2px); }
+        /* Access Button */
+        .access-container { text-align: center; margin-bottom: 8rem; }
+        .btn-launch { background: var(--text-color); color: var(--bg-color); padding: 1.2rem 3.5rem; border: none; border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 1, 0.2, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .btn-launch:hover { background: #333; transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
 
+        /* Sections */
         .info-section { max-width: 1200px; margin: 0 auto 4rem auto; padding: 4rem; border-top: 1px solid var(--border-color); }
-        .info-section h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 3rem; }
+        .info-section h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 4rem; font-weight: 400; }
         
-        /* Refined Architect Card */
-        .architect-card { background: #fff; border: 1px solid rgba(28, 28, 28, 0.08); padding: 4rem; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); margin-bottom: 2rem; }
+        /* Institutional Origin Card (Replaces "About the Architect") */
+        .origin-card { background: #fff; border: 1px solid rgba(28, 28, 28, 0.08); padding: 4rem; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.03); margin-bottom: 2rem; transition: transform 0.6s ease; }
+        .origin-card:hover { transform: translateY(-5px); }
         
-        /* New Profile Layout */
-        .architect-profile { display: grid; grid-template-columns: 1fr 180px; gap: 4rem; align-items: center; }
-        .author-image-container { display: flex; justify-content: center; }
-        .author-image { width: 180px; height: 180px; border-radius: 50%; box-shadow: 0 8px 25px rgba(0,0,0,0.1); object-fit: cover; object-position: center 20%; border: 3px solid #fff; }
+        .origin-profile { display: grid; grid-template-columns: 1fr 200px; gap: 4rem; align-items: center; }
+        .author-image-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .author-image { width: 160px; height: 160px; border-radius: 50%; box-shadow: 0 15px 35px rgba(0,0,0,0.1); object-fit: cover; object-position: center 20%; border: 4px solid var(--bg-color); transition: transform 0.6s ease; filter: grayscale(20%); }
+        .author-image:hover { transform: scale(1.05); filter: grayscale(0%); }
         
-        .architect-bio p { color: var(--text-muted); font-weight: 300; font-size: 1.05rem; text-align: justify; margin-bottom: 1.5rem; }
+        .origin-bio p { color: var(--text-muted); font-weight: 300; font-size: 1.1rem; text-align: justify; margin-bottom: 1.8rem; line-height: 1.8; }
+        .origin-bio strong { color: var(--text-color); font-weight: 500; }
         
-        .endorsement-block { display: flex; align-items: center; gap: 1.5rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
-        .endorsement-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; }
-        .endorsement-logo { height: 60px; width: auto; object-fit: contain; }
+        .endorsement-block { display: flex; align-items: center; gap: 2rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+        .endorsement-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--text-muted); font-weight: 600; }
+        .endorsement-logo { height: 50px; width: auto; object-fit: contain; filter: opacity(0.8); transition: filter 0.4s ease; }
+        .endorsement-logo:hover { filter: opacity(1); }
 
-        .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-        .tip-card { background: transparent; border: 1px solid var(--border-color); padding: 2.5rem; border-radius: 12px; transition: transform 0.3s, background 0.3s; }
-        .tip-card:hover { transform: translateY(-5px); background: #ffffff; }
-        .tip-quote { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-style: italic; margin-bottom: 1.5rem; }
-        .tip-author { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        /* Tips Grid */
+        .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; }
+        .tip-card { background: transparent; border: 1px solid var(--border-color); padding: 3rem 2.5rem; border-radius: 16px; transition: all 0.6s cubic-bezier(0.25, 1, 0.2, 1); }
+        .tip-card:hover { transform: translateY(-8px); background: #ffffff; box-shadow: 0 20px 40px rgba(0,0,0,0.04); border-color: transparent; }
+        .tip-quote { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-style: italic; margin-bottom: 2rem; line-height: 1.5; color: var(--text-color); }
+        .tip-author { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
 
-        footer { border-top: 1px solid var(--border-color); padding: 3rem 4rem; display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .footer-links a { color: inherit; text-decoration: none; margin-left: 2rem; transition: color 0.2s; }
+        footer { border-top: 1px solid var(--border-color); padding: 4rem; display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+        .footer-links a { color: inherit; text-decoration: none; margin-left: 2.5rem; transition: color 0.3s; }
         .footer-links a:hover { color: var(--text-color); }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             h1 { font-size: 3.5rem; }
             .info-section { padding: 2rem; }
             .nav-links { display: none; }
-            footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+            .origin-profile { grid-template-columns: 1fr; text-align: center; gap: 3rem; }
+            .author-image-container { order: -1; }
+            .origin-bio p { text-align: center; }
+            .endorsement-block { flex-direction: column; justify-content: center; }
+            footer { flex-direction: column; gap: 2rem; text-align: center; }
             .footer-links a { margin: 0 1rem; }
-            
-            /* Mobile Profile Layout */
-            .architect-profile { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 2rem; }
-            .author-image-container { order: -1; margin-bottom: 1rem; }
-            .architect-bio p { text-align: center; }
-            .endorsement-block { flex-direction: column; text-align: center; justify-content: center; }
         }
     </style>
 </head>
@@ -89,36 +118,38 @@
     <nav>
         <div class="logo">SmartST DMS.</div>
         <div class="nav-links">
-            <a href="#about">Credits</a>
+            <a href="#origins">Origins</a>
             <a href="#insights">Insights</a>
             <a href="rdmp.html">Roadmap</a>
             <a href="index.html">Access Portal</a>
         </div>
     </nav>
 
-    <section class="hero">
+    <section class="hero reveal">
         <h1>Elevating <i>Discourse</i><br>to an Art Form.</h1>
-        <p class="subtitle">A structured, low-latency architecture designed for executive communication, rigorous debate, and objective analysis.</p>
+        <p class="subtitle reveal delay-1">A structured, low-latency architecture designed for executive communication, rigorous institutional debate, and objective analysis.</p>
     </section>
 
-    <div class="image-container">
-        <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop" alt="Minimalist Lone Tree">
+    <div class="image-wrapper reveal delay-2">
+        <div class="image-container">
+            <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop" alt="Minimalist Serene Tree">
+        </div>
     </div>
 
-    <div class="access-container">
-        <button class="btn-launch" onclick="window.location.href='index.html'">Launch SmartST Debate Login</button>
+    <div class="access-container reveal delay-3">
+        <button class="btn-launch" onclick="window.location.href='index.html'">Launch Debate Terminal</button>
     </div>
 
-    <section id="about" class="info-section">
-        <h2>About the Architect</h2>
-        <div class="architect-card">
-            <div class="architect-profile">
-                <div class="architect-bio">
-                    <p>The SmartST Debate Management Suite (DMS) was engineered by <strong>Alexios ELIZALDE XIROKOSTA</strong>, a 20-year-old scholar at the IUT de Toulouse (formerly Université Paul Sabatier III) and the Chief Executive Officer of the European Fire Prevention & Rural Preservation Organization (EFPRP).</p>
+    <section id="origins" class="info-section">
+        <h2 class="reveal">System Origins & Development</h2>
+        <div class="origin-card reveal delay-1">
+            <div class="origin-profile">
+                <div class="origin-bio">
+                    <p>The SmartST Debate Management Suite was developed to meet the precise, low-latency demands of institutional discourse. Architected by <strong>Alexios Elizalde Xirokosta</strong>—Information-Communication scholar at the IUT de Toulouse and Chief Executive Officer of the European Fire Prevention & Rural Preservation Organization (EFPRP)—the platform reflects a rigorous commitment to digital utility and procedural fairness.</p>
                     
-                    <p>Driven by a passion to optimize daily workflows for professionals and academics, Mr. Elizalde's development portfolio focuses on high-utility cloud applications. This includes the successful deployment of the <em>MCalC+ SmartST OS</em>—a comprehensive software ecosystem designed for the BUT Infocom 2025-2026 cohort. This system modernized academic logistics by replacing static PDF schedules with a dynamic digital calendar, while fully integrating grade calculations (moyennes), automated absence tracking (suivi d'absence), dynamic roll call (appel), digital homework logs (devoirs), and a robust cloud roadmap.</p>
+                    <p>This suite builds upon the architectural foundation of previous academic ecosystems, notably the <em>MCalC+ SmartST OS</em>. Deployed for the BUT Infocom 2025-2026 cohort, MCalC+ successfully modernized complex organizational logistics by replacing static schedules with a dynamic cloud framework, seamlessly integrating absence tracking, algorithmic grading, and centralized planning.</p>
                     
-                    <p>Expanding upon this technical foundation, the SmartST DMS was purpose-built to empower universities and institutions to execute high-scale, synchronized debates. Featuring intuitive, enterprise-grade functionality and stringent administrative controls, the platform ensures absolute clarity and fairness.</p>
+                    <p>Today, the SmartST DMS inherits that legacy of optimization, empowering universities and organizations to host large-scale, synchronized forums with absolute executive control and uncompromised elegance.</p>
 
                     <div class="endorsement-block">
                         <div class="endorsement-label">Officially Endorsed By</div>
@@ -126,31 +157,32 @@
                     </div>
                 </div>
                 <div class="author-image-container">
-                    <img src="authorito.png" alt="Alexios ELIZALDE XIROKOSTA" class="author-image">
+                    <img src="author.png" alt="Architect Portrait" class="author-image">
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-top: 0.5rem;">Lead Architect</div>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="insights" class="info-section" style="border-top: none; padding-top: 0;">
-        <h2>Strategic Insights</h2>
+        <h2 class="reveal">Strategic Insights</h2>
         <div class="tips-grid">
-            <div class="tip-card">
+            <div class="tip-card reveal delay-1">
                 <div class="tip-quote">"Don't raise your voice, improve your argument."</div>
                 <div class="tip-author">— Desmond Tutu</div>
             </div>
-            <div class="tip-card">
+            <div class="tip-card reveal delay-2">
                 <div class="tip-quote">"He who knows only his own side of the case knows little of that."</div>
                 <div class="tip-author">— John Stuart Mill</div>
             </div>
-            <div class="tip-card">
+            <div class="tip-card reveal delay-3">
                 <div class="tip-quote">"The supreme art of war is to subdue the enemy without fighting."</div>
                 <div class="tip-author">— Sun Tzu</div>
             </div>
         </div>
     </section>
 
-    <footer>
+    <footer class="reveal">
         <div>&copy; 2026 SmartST DMS. All Rights Reserved.</div>
         <div class="footer-links">
             <a href="tos.html">Terms of Service</a>
@@ -158,6 +190,22 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.15 };
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
 </body>
 </html>
-
