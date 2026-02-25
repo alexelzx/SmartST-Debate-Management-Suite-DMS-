@@ -18,6 +18,7 @@
         .btn-success { background: var(--success); color: #fff; }
         .btn-danger { background: var(--danger); color: #fff; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: #666; }
+        .btn-grade { background: var(--accent); color: #fff; }
         input { padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 1rem; }
         #init-state { max-width: 600px; margin: 5rem auto; text-align: center; }
         #active-state { display: none; }
@@ -56,12 +57,15 @@
             <div class="panel">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h3>Roster & Parole Control</h3>
-                    <div id="codeDisplay" style="font-weight: bold; letter-spacing: 2px;">CODE: ------</div>
+                    <div style="text-align: right;">
+                        <div id="codeDisplay" style="font-weight: bold; letter-spacing: 2px;">CODE: ------</div>
+                        <div id="totalConnected" style="font-size: 0.8rem; color: var(--success); font-weight: 600; margin-top: 0.5rem;">CONNECTED: 0</div>
+                    </div>
                 </div>
                 <div style="margin-bottom: 1.5rem;">
                     <label style="font-size: 0.75rem; text-transform: uppercase; color: #888;">Override Parole Duration (Min)</label>
-                    <input type="number" id="manualTimer" placeholder="Minutes" style="margin-top: 0.5rem;">
-                    <button class="btn-danger" style="width: 100%;" onclick="revokeFloor()">Halt Current Speaker</button>
+                    <input type="number" id="manualTimer" placeholder="Minutes" style="margin-top: 0.5rem; width: 100px; display: inline-block; margin-right: 1rem;">
+                    <button class="btn-danger" onclick="revokeFloor()">Halt Current Speaker</button>
                 </div>
                 <div id="participantList"></div>
             </div>
@@ -116,7 +120,10 @@
                 if(s.exists()){ currentQueue = s.data().queue || []; renderRoster(); }
             });
             onSnapshot(collection(db, "debates", sessionCode, "participants"), (s) => {
-                s.forEach(d => pData[d.id] = d.data()); renderRoster();
+                pData = {};
+                s.forEach(d => pData[d.id] = d.data()); 
+                document.getElementById('totalConnected').innerText = `CONNECTED: ${Object.keys(pData).length}`;
+                renderRoster();
             });
         }
 
@@ -134,15 +141,29 @@
         function createRow(pid, data, qPos) {
             const row = document.createElement('div'); row.className = 'participant-row';
             let badge = qPos ? `<span class="queue-badge">Q#${qPos}</span>` : '';
+            let points = data.points || 0;
+            
             row.innerHTML = `
-                <div><strong>${data.name}${badge}</strong><br><small>${data.side} | ${data.team || '--'}</small></div>
+                <div>
+                    <strong>${data.name}${badge}</strong> 
+                    <span style="color:var(--success); font-weight:bold; margin-left: 0.5rem;">(${points} PT)</span><br>
+                    <small>${data.side} | ${data.team || '--'}</small>
+                </div>
                 <div style="display:flex; gap:0.5rem;">
+                    <button class="btn-grade" onclick="awardPoint('${pid}')">+1 PT</button>
                     <button class="btn-success" onclick="grantParole('${pid}')">Grant</button>
                     <button class="btn-danger" onclick="issueWarn('${pid}')">Warn</button>
                     <button class="btn-outline" onclick="clearWarn('${pid}')">Clear</button>
                 </div>`;
             return row;
         }
+
+        window.awardPoint = async (pid) => {
+            const p = pData[pid];
+            const currentPoints = p.points || 0;
+            await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { points: currentPoints + 1 });
+            appendLog(`ACCOLADE: +1 Point awarded to ${p.name}`);
+        };
 
         window.grantParole = async (pid) => {
             try {
