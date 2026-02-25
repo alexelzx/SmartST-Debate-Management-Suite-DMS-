@@ -4,35 +4,56 @@
     <meta charset="UTF-8">
     <title>SmartST DMS - Projector View</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@300;400;500;600&display=swap');
-        :root { --bg-overlay: rgba(244, 242, 237, 0.94); --text-color: #1C1C1C; --text-muted: #666666; --border: rgba(28, 28, 28, 0.1); --danger: #b3261e; --success: #16a34a; }
-        body { margin: 0; color: var(--text-color); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; display: flex; flex-direction: column; }
-        .bg-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-overlay); backdrop-filter: blur(15px); z-index: -1; }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
         
-        .fullscreen-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 900; backdrop-filter: blur(5px); color: white; text-align: center; }
+        :root { --bg-overlay: rgba(244, 242, 237, 0.92); --text-color: #1C1C1C; --text-muted: #555555; --border: rgba(28, 28, 28, 0.15); --danger: #b3261e; --success: #16a34a; }
+        
+        /* Strict Fullscreen Constraints */
+        body { margin: 0; color: var(--text-color); font-family: 'Inter', sans-serif; height: 100vh; width: 100vw; overflow: hidden; background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; display: flex; flex-direction: column; }
+        
+        .bg-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-overlay); backdrop-filter: blur(20px); z-index: -1; }
+        
+        /* Overlays */
+        .fullscreen-overlay { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 900; backdrop-filter: blur(10px); color: white; text-align: center; }
         #global-pause-overlay { background: rgba(0, 0, 0, 0.85); }
-        #global-pause-overlay h1 { font-family: 'Playfair Display', serif; font-size: 6rem; margin: 0; color: #fff; letter-spacing: 2px; }
-        #ended-overlay { background: rgba(179, 38, 30, 0.9); }
-        #ended-overlay h1 { font-family: 'Playfair Display', serif; font-size: 6rem; margin: 0; text-transform: uppercase; }
+        #global-pause-overlay h1 { font-family: 'Playfair Display', serif; font-size: clamp(4rem, 8vw, 8rem); margin: 0; color: #fff; letter-spacing: 2px; }
+        #ended-overlay { background: rgba(179, 38, 30, 0.95); }
+        #ended-overlay h1 { font-family: 'Playfair Display', serif; font-size: clamp(4rem, 8vw, 8rem); margin: 0; text-transform: uppercase; }
 
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.3); }
-        .logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 600; }
-        .master-clock { font-family: monospace; font-size: 2.5rem; font-weight: bold; background: var(--text-color); color: var(--bg-overlay); padding: 0.5rem 2rem; border-radius: 50px; display: flex; align-items: center; gap: 1rem; }
-        .extra-badge { background: var(--success); color: #fff; font-size: 1rem; font-family: 'Inter', sans-serif; padding: 0.2rem 0.8rem; border-radius: 4px; display: none; text-transform: uppercase; letter-spacing: 1px;}
+        /* Navigation / Top Bar */
+        nav { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 600; letter-spacing: -1px; }
+        .master-clock { font-family: monospace; font-size: 3rem; font-weight: bold; background: var(--text-color); color: var(--bg-overlay); padding: 0.5rem 2.5rem; border-radius: 50px; display: flex; align-items: center; gap: 1rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .extra-badge { background: var(--success); color: #fff; font-size: 1.2rem; font-family: 'Inter', sans-serif; padding: 0.3rem 1rem; border-radius: 6px; display: none; text-transform: uppercase; letter-spacing: 2px;}
         
-        .main-display { flex: 1; display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; padding: 3rem 4rem; box-sizing: border-box; }
-        .active-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(255,255,255,0.6); border-radius: 24px; border: 1px solid var(--border); padding: 4rem; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
-        .theme-title { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 5px; color: var(--text-muted); margin-bottom: 3rem; font-weight: 500; }
-        .meta-info { font-size: 1.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 4px; color: var(--text-muted); margin-bottom: 1.5rem; padding: 0.5rem 2rem; background: rgba(0,0,0,0.04); border-radius: 100px; }
-        .speaker-name { font-family: 'Playfair Display', serif; font-size: 6vw; font-weight: 400; margin: 0 0 1rem 0; line-height: 1.1; letter-spacing: -2px; }
-        .timer { font-size: 12vw; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -5px; }
+        #educatorBanner { flex: 0 0 auto; background: var(--text-color); color: #fff; padding: 1.5rem; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; font-size: 1.5rem; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 50; }
+
+        /* Main Content Grid */
+        .main-display { flex: 1 1 auto; display: grid; grid-template-columns: 2.5fr 1fr; gap: 3rem; padding: 3rem 4rem; box-sizing: border-box; height: 100%; overflow: hidden; }
+        
+        /* Active Speaker Stage */
+        .active-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(255,255,255,0.65); border-radius: 32px; border: 1px solid rgba(255,255,255,0.5); padding: 4rem; box-shadow: 0 20px 50px rgba(0,0,0,0.05); height: 100%; box-sizing: border-box; }
+        .theme-title { font-size: clamp(1.5rem, 3vh, 2.5rem); text-transform: uppercase; letter-spacing: 5px; color: var(--text-muted); margin-bottom: auto; font-weight: 500; }
+        .speaker-profile { margin: auto 0; }
+        .meta-info { font-size: clamp(1.2rem, 2.5vh, 2rem); font-weight: 600; text-transform: uppercase; letter-spacing: 4px; color: var(--text-muted); margin-bottom: 1.5rem; padding: 0.8rem 2.5rem; background: rgba(0,0,0,0.04); border-radius: 100px; display: inline-block; }
+        .speaker-name { font-family: 'Playfair Display', serif; font-size: clamp(4rem, 8vh, 8rem); font-weight: 400; margin: 0 0 2rem 0; line-height: 1.1; letter-spacing: -2px; }
+        
+        /* Massive Adaptive Timer */
+        .timer { font-size: clamp(10rem, 22vh, 25rem); font-weight: 300; font-variant-numeric: tabular-nums; line-height: 0.9; letter-spacing: -5px; margin-top: auto; }
         .timer.danger { color: var(--danger); animation: pulse 1s infinite; }
-        .queue-sidebar { background: rgba(255,255,255,0.4); border-radius: 24px; border: 1px solid var(--border); padding: 2.5rem; display: flex; flex-direction: column; }
-        .queue-header { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem; }
-        .queue-list { flex: 1; overflow-y: auto; }
-        .queue-item { display: flex; align-items: center; padding: 1.2rem; background: rgba(255,255,255,0.7); border-radius: 12px; margin-bottom: 1rem; border: 1px solid var(--border); }
-        .queue-pos { font-weight: 600; width: 40px; height: 40px; background: var(--text-color); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; font-size: 1rem; }
-        .queue-name { font-size: 1.3rem; font-weight: 500; }
+        
+        /* Queue Sidebar */
+        .queue-sidebar { background: rgba(255,255,255,0.45); border-radius: 32px; border: 1px solid rgba(255,255,255,0.5); padding: 3rem 2.5rem; display: flex; flex-direction: column; height: 100%; box-sizing: border-box; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
+        .queue-header { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--border); padding-bottom: 1rem; flex: 0 0 auto; }
+        
+        /* Hide Scrollbar for clean projector aesthetic */
+        .queue-list { flex: 1 1 auto; overflow-y: auto; padding-right: 10px; -ms-overflow-style: none; scrollbar-width: none; }
+        .queue-list::-webkit-scrollbar { display: none; }
+        
+        .queue-item { display: flex; align-items: center; padding: 1.5rem; background: rgba(255,255,255,0.8); border-radius: 16px; margin-bottom: 1rem; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .queue-pos { font-weight: 600; width: 50px; height: 50px; background: var(--text-color); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; font-size: 1.2rem; flex-shrink: 0; }
+        .queue-name { font-size: 1.5rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
     </style>
 </head>
@@ -40,23 +61,29 @@
     <div class="bg-overlay"></div>
     
     <div id="global-pause-overlay" class="fullscreen-overlay">
-        <h1>Forum/Debate Paused</h1>
-        <p style="font-size: 1.5rem; margin-top: 1rem;">The debate will resume shortly. Remain seated please.</p>
+        <h1>Forum Paused</h1>
+        <p style="font-size: 2rem; margin-top: 1rem; letter-spacing: 2px;">The debate will resume shortly. Remain seated please.</p>
     </div>
 
     <div id="ended-overlay" class="fullscreen-overlay">
         <h1>Debate Has Ended</h1>
+        <p style="font-size: 2rem; margin-top: 1rem; letter-spacing: 2px;">The forum has been officially concluded by the Executive Host.</p>
     </div>
 
+    <div id="educatorBanner">📢 EDUCATOR DIRECTIVE: <span></span></div>
+
     <nav>
-        <div class="logo">SmartST.</div>
+        <div class="logo">SmartST DMS.</div>
         <div class="master-clock"><span id="masterClockDisplay">00:00:00</span> <span id="extraTimeBadge" class="extra-badge">Extra Time</span></div>
     </nav>
+    
     <div class="main-display">
         <div class="active-stage">
             <div class="theme-title" id="themeDisplay">Initializing Forum...</div>
-            <div class="meta-info" id="teamDisplay">-- | --</div>
-            <h2 class="speaker-name" id="speakerDisplay">Floor Open</h2>
+            <div class="speaker-profile">
+                <div class="meta-info" id="teamDisplay">-- | --</div>
+                <h2 class="speaker-name" id="speakerDisplay">Floor Open</h2>
+            </div>
             <div class="timer" id="timeDisplay">00:00</div>
         </div>
         <div class="queue-sidebar">
@@ -64,14 +91,17 @@
             <div class="queue-list" id="queueList"></div>
         </div>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getFirestore, doc, onSnapshot, collection, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        
         const firebaseConfig = { apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0", authDomain: "smartst-debate.firebaseapp.com", projectId: "smartst-debate", storageBucket: "smartst-debate.firebasestorage.app", messagingSenderId: "128238171772", appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const urlParams = new URLSearchParams(window.location.search);
         const joinCode = urlParams.get('code');
+        
         let timerInterval, masterTimerInterval, pNames = {};
 
         if (joinCode) {
@@ -91,13 +121,21 @@
                     document.getElementById('ended-overlay').style.display = data.globalStatus === 'ended' ? 'flex' : 'none';
                     document.getElementById('extraTimeBadge').style.display = data.isExtraTime ? 'inline-block' : 'none';
 
+                    const edBanner = document.getElementById('educatorBanner');
+                    if (data.educatorMessage && data.educatorMessage.trim() !== "") {
+                        edBanner.querySelector('span').innerText = data.educatorMessage; edBanner.style.display = 'block';
+                    } else { edBanner.style.display = 'none'; }
+
                     manageMasterTimer(data.globalEndTimeMs, data.globalStatus === 'active', data.globalRemainingMs);
 
                     document.getElementById('themeDisplay').innerText = data.theme || "General Debate";
                     document.getElementById('speakerDisplay').innerText = data.activeSpeakerName || "Floor Open";
                     document.getElementById('teamDisplay').innerText = `${data.activeSide || '--'} | ${data.activeTeam || '--'}`;
+                    
                     renderQueue(data.queue || []);
-                    manageTimer(data.endTimeMs, data.isTimerRunning);
+                    
+                    // Crucial: Pass the speakerRemainingMs to ensure perfect sync during pauses
+                    manageTimer(data.endTimeMs, data.isTimerRunning, data.speakerRemainingMs);
                 }
             });
         }
@@ -108,7 +146,7 @@
                 const name = pNames[pid] || "Identifying...";
                 list.innerHTML += `<div class="queue-item"><div class="queue-pos">${idx + 1}</div><div class="queue-name">${name}</div></div>`;
             });
-            if(queueArray.length === 0) list.innerHTML = '<div style="color:#888; text-align:center; margin-top:2rem;">Queue is currently empty.</div>';
+            if(queueArray.length === 0) list.innerHTML = '<div style="color:#888; text-align:center; margin-top:2rem; font-size: 1.2rem;">Queue is currently empty.</div>';
         }
 
         function manageMasterTimer(endMs, isRunning, staticRemaining) {
@@ -125,17 +163,34 @@
             masterTimerInterval = setInterval(() => { display.innerText = formatTime(endMs - Date.now()); }, 500);
         }
 
-        function manageTimer(end, running) {
+        function manageTimer(endTime, isRunning, remainingMs) {
             clearInterval(timerInterval);
             const display = document.getElementById('timeDisplay');
-            if (!running || !end) { display.classList.remove('danger'); display.innerText = "00:00"; return; }
+            const formatTime = (ms) => {
+                if (ms <= 0) return "00:00";
+                const m = Math.floor(ms / 60000);
+                const s = Math.floor((ms % 60000) / 1000);
+                return `${m}:${s.toString().padStart(2, '0')}`;
+            };
+
+            // If the timer is NOT running (e.g., Debate Paused or Floor Open)
+            if (!isRunning) {
+                display.innerText = (remainingMs && remainingMs > 0) ? formatTime(remainingMs) : "00:00";
+                display.classList.remove('danger');
+                return;
+            }
+
+            // If the timer IS running
             timerInterval = setInterval(() => {
-                const rem = end - Date.now();
-                if (rem <= 0) { clearInterval(timerInterval); display.innerText = "00:00"; display.classList.add('danger'); }
-                else {
-                    const m = Math.floor(rem / 60000), s = Math.floor((rem % 60000) / 1000);
-                    display.innerText = `${m}:${s.toString().padStart(2, '0')}`;
-                    if (rem < 15000) display.classList.add('danger'); else display.classList.remove('danger');
+                const rem = endTime - Date.now();
+                if (rem <= 0) { 
+                    clearInterval(timerInterval); 
+                    display.innerText = "00:00"; 
+                    display.classList.add('danger'); 
+                } else {
+                    display.innerText = formatTime(rem);
+                    if (rem < 15000) display.classList.add('danger'); 
+                    else display.classList.remove('danger');
                 }
             }, 100);
         }
