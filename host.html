@@ -5,7 +5,7 @@
     <title>SmartST DMS - Executive Host</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@400;600&display=swap');
-        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; }
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; --accent: #2c3e50; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-color); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
         nav { padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
@@ -22,6 +22,9 @@
         #init-state { max-width: 600px; margin: 5rem auto; text-align: center; }
         #active-state { display: none; }
         .queue-badge { font-size: 0.65rem; background: var(--text-color); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 0.5rem; }
+        .broadcast-panel { background: var(--text-color); color: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; grid-column: span 2; display: flex; align-items: center; gap: 1rem; }
+        .broadcast-panel input { margin: 0; flex: 1; border: none; background: rgba(255,255,255,0.1); color: #fff; }
+        .broadcast-panel input::placeholder { color: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
@@ -42,6 +45,14 @@
         </div>
 
         <div id="active-state" style="display: none; grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            
+            <div class="broadcast-panel">
+                <div style="font-family: 'Playfair Display', serif; font-size: 1.2rem; min-width: 150px;">Educator Mode</div>
+                <input type="text" id="educatorMsg" placeholder="Transmit a global directive, tip, or reminder to all screens...">
+                <button class="btn-success" onclick="broadcastMessage()">Transmit</button>
+                <button class="btn-outline" style="border-color: rgba(255,255,255,0.3); color: #fff;" onclick="clearBroadcast()">Clear</button>
+            </div>
+
             <div class="panel">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h3>Roster & Parole Control</h3>
@@ -90,7 +101,7 @@
             sessionCode = code;
             await setDoc(doc(db, "debates", sessionCode), {
                 theme: document.getElementById('initTheme').value || "General Debate",
-                queue: [], activeSpeakerId: null, activeSpeakerName: "Floor Open", activeTeam: "--", activeSide: "--", isTimerRunning: false, endTimeMs: null
+                queue: [], activeSpeakerId: null, activeSpeakerName: "Floor Open", activeTeam: "--", activeSide: "--", isTimerRunning: false, endTimeMs: null, educatorMessage: ""
             });
             document.getElementById('init-state').style.display = 'none';
             document.getElementById('active-state').style.display = 'grid';
@@ -102,41 +113,26 @@
 
         function initSync() {
             onSnapshot(doc(db, "debates", sessionCode), (s) => {
-                if(s.exists()){
-                    currentQueue = s.data().queue || [];
-                    renderRoster();
-                }
+                if(s.exists()){ currentQueue = s.data().queue || []; renderRoster(); }
             });
             onSnapshot(collection(db, "debates", sessionCode, "participants"), (s) => {
-                s.forEach(d => pData[d.id] = d.data());
-                renderRoster();
+                s.forEach(d => pData[d.id] = d.data()); renderRoster();
             });
         }
 
         function renderRoster() {
             const div = document.getElementById('participantList'); 
-            div.innerHTML = '';
-            let rendered = new Set();
-            
-            // Render queued participants first
+            div.innerHTML = ''; let rendered = new Set();
             currentQueue.forEach((pid, idx) => {
-                if(pData[pid]){
-                    div.appendChild(createRow(pid, pData[pid], idx + 1));
-                    rendered.add(pid);
-                }
+                if(pData[pid]){ div.appendChild(createRow(pid, pData[pid], idx + 1)); rendered.add(pid); }
             });
-            
-            // Render non-queued participants
             for (let pid in pData) {
-                if (!rendered.has(pid)) {
-                    div.appendChild(createRow(pid, pData[pid], null));
-                }
+                if (!rendered.has(pid)) div.appendChild(createRow(pid, pData[pid], null));
             }
         }
 
         function createRow(pid, data, qPos) {
-            const row = document.createElement('div'); 
-            row.className = 'participant-row';
+            const row = document.createElement('div'); row.className = 'participant-row';
             let badge = qPos ? `<span class="queue-badge">Q#${qPos}</span>` : '';
             row.innerHTML = `
                 <div><strong>${data.name}${badge}</strong><br><small>${data.side} | ${data.team || '--'}</small></div>
@@ -153,13 +149,8 @@
                 const p = pData[pid];
                 const mins = parseInt(document.getElementById('manualTimer').value) || parseInt(document.getElementById('baseTimer').value) || 5;
                 await updateDoc(doc(db, "debates", sessionCode), {
-                    activeSpeakerId: pid,
-                    activeSpeakerName: p.name || "Unknown",
-                    activeTeam: p.team || "--",
-                    activeSide: p.side || "--",
-                    endTimeMs: Date.now() + (mins * 60000),
-                    isTimerRunning: true,
-                    queue: arrayRemove(pid)
+                    activeSpeakerId: pid, activeSpeakerName: p.name || "Unknown", activeTeam: p.team || "--", activeSide: p.side || "--",
+                    endTimeMs: Date.now() + (mins * 60000), isTimerRunning: true, queue: arrayRemove(pid)
                 });
                 appendLog(`PAROLE GRANTED: ${p.name} (${mins}m)`);
             } catch (err) { alert("Grant Error: " + err.message); }
@@ -172,15 +163,21 @@
 
         window.issueWarn = async (pid) => {
             const m = prompt("Warning Directive:");
-            if(m) {
-                await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: m });
-                appendLog(`WARNING: ${pData[pid].name} - ${m}`);
-            }
+            if(m) { await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: m }); appendLog(`WARNING: ${pData[pid].name} - ${m}`); }
         };
 
         window.clearWarn = async (pid) => {
-            await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: "" });
-            appendLog(`CLEAR: Warning removed for ${pData[pid].name}`);
+            await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: "" }); appendLog(`CLEAR: Warning removed for ${pData[pid].name}`);
+        };
+
+        window.broadcastMessage = async () => {
+            const msg = document.getElementById('educatorMsg').value.trim();
+            if(msg) { await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: msg }); appendLog(`BROADCAST: ${msg}`); }
+        };
+
+        window.clearBroadcast = async () => {
+            document.getElementById('educatorMsg').value = '';
+            await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: "" }); appendLog(`BROADCAST CLEARED`);
         };
     </script>
 </body>
