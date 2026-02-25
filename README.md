@@ -3,7 +3,7 @@
 SmartST DMS is a high-fidelity, real-time synchronization engine designed for structured executive discourse and professional debate. By leveraging cloud-synchronized chronometry, it ensures absolute fairness and objective analysis in high-stakes forum environments .
 
 ## 🌳 Architectural Vision
-The suite utilizes a sophisticated editorial aesthetic inspired by modern minimalist design, intended to foster a tranquil yet authoritative atmosphere for rigorous intellectual exchange [cite: 2026-02-10].
+The suite utilizes a sophisticated editorial aesthetic inspired by modern minimalist design, intended to foster a tranquil yet authoritative atmosphere for rigorous intellectual exchange.
 
 ## 🛠 Core Ecosystem
 The platform is comprised of six distinct modules working in unison :
