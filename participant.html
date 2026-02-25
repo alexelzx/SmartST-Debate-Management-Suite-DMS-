@@ -5,10 +5,7 @@
     <title>SmartST DMS - Debator Panel</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@300;400;600&display=swap');
-        
-        /* The missing --warn variable has been securely integrated */
         :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; --accent: #2c3e50; --warn: #ea580c; }
-        
         body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         #app-container { display: flex; flex-direction: column; height: 100%; transition: all 1s ease; }
@@ -36,7 +33,6 @@
         nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; z-index: 10;}
         .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
         
-        /* Personal Standing Badge */
         .stats-badge { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #fff; padding: 0.5rem 1rem; border-radius: 50px; background: var(--text-color); transition: background 0.3s; font-weight: 600; }
 
         .workspace { display: flex; flex: 1; overflow: hidden; }
@@ -51,7 +47,6 @@
         
         #setup-screen { position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--bg-color); z-index: 1000; display: flex; align-items: center; justify-content: center; }
         
-        /* High-Visibility Warning Banner */
         #warning-banner { background: var(--warn); color: white; padding: 1rem; text-align: center; font-weight: 600; display: none; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.2); }
         
         #educatorBanner { background: var(--text-color); color: #fff; padding: 1rem; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; display: none; }
@@ -202,7 +197,7 @@
                 if (meSpeaking && !wasSpeaking) { document.getElementById('turn-overlay').style.display = 'flex'; document.getElementById('paroleSound').play(); card.classList.add('is-speaking'); wasSpeaking = true; } 
                 else if (!meSpeaking) { card.classList.remove('is-speaking'); document.getElementById('turn-overlay').style.display = 'none'; wasSpeaking = false; }
                 
-                manageTimer(data.endTimeMs, data.isTimerRunning); updateQueueUI(data.queue || []);
+                manageTimer(data.endTimeMs, data.isTimerRunning, data.speakerRemainingMs); updateQueueUI(data.queue || []);
             });
 
             onSnapshot(collection(db, "debates", joinCode, "participants"), (snap) => {
@@ -213,24 +208,18 @@
                 });
             });
 
-            // Participant Local Overlays & Badges
             onSnapshot(doc(db, "debates", joinCode, "participants", participantId), (s) => {
                 const d = s.data(); 
                 if(!d) return;
                 
                 if (d.kicked) { alert("You were kicked from the session. Do not rejoin."); window.location.href = "main.html"; return; }
 
-                // Personal Standing Badge Logic
                 const statsBadge = document.getElementById('myStatsBadge');
                 statsBadge.style.display = 'block';
                 statsBadge.innerText = `${d.points || 0} PT | ${d.strikes || 0} STRIKES`;
-                if ((d.strikes || 0) > 0) {
-                    statsBadge.style.background = 'var(--danger)';
-                } else if ((d.points || 0) > 0) {
-                    statsBadge.style.background = 'var(--success)';
-                } else {
-                    statsBadge.style.background = 'var(--text-color)';
-                }
+                if ((d.strikes || 0) > 0) { statsBadge.style.background = 'var(--danger)'; } 
+                else if ((d.points || 0) > 0) { statsBadge.style.background = 'var(--success)'; } 
+                else { statsBadge.style.background = 'var(--text-color)'; }
 
                 if (d.strikeMessage) {
                     document.getElementById('strike-reason').innerText = `Directive: ${d.strikeMessage}`;
@@ -243,7 +232,6 @@
                     document.getElementById('direct-msg-overlay').style.display = 'flex';
                 } else { document.getElementById('direct-msg-overlay').style.display = 'none'; }
 
-                // High-Visibility Warning Banner Logic
                 const banner = document.getElementById('warning-banner');
                 if(d.warning) { document.getElementById('warning-text').innerText = d.warning; banner.style.display = 'block'; } else banner.style.display = 'none';
             });
@@ -252,12 +240,25 @@
         window.toggleQueue = async () => { const ref = doc(db, "debates", joinCode); if(inQueue) await updateDoc(ref, { queue: arrayRemove(participantId) }); else await updateDoc(ref, { queue: arrayUnion(participantId) }); };
         function updateQueueUI(q) { const idx = q.indexOf(participantId); inQueue = idx !== -1; const btn = document.getElementById('queueBtn'); btn.innerText = inQueue ? "Revoke Request" : "Request Parole"; document.getElementById('queueStatus').innerText = inQueue ? `Position: ${idx + 1}` : "Not in queue."; }
         
-        function manageTimer(e, r) {
-            clearInterval(timerInterval); if(!r || !e) { document.getElementById('timeDisplay').innerText = "00:00"; return; }
+        function manageTimer(endTime, isRunning, remainingMs) {
+            clearInterval(timerInterval);
+            const display = document.getElementById('timeDisplay');
+            const formatTime = (ms) => {
+                if (ms <= 0) return "00:00";
+                const m = Math.floor(ms / 60000);
+                const s = Math.floor((ms % 60000) / 1000);
+                return `${m}:${s.toString().padStart(2, '0')}`;
+            };
+
+            if (!isRunning) {
+                display.innerText = (remainingMs && remainingMs > 0) ? formatTime(remainingMs) : "00:00";
+                return;
+            }
+
             timerInterval = setInterval(() => {
-                const rem = e - Date.now();
-                if(rem <= 0) { clearInterval(timerInterval); document.getElementById('timeDisplay').innerText = "00:00"; }
-                else { const m = Math.floor(rem/60000), s = Math.floor((rem%60000)/1000); document.getElementById('timeDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; }
+                const rem = endTime - Date.now();
+                if (rem <= 0) { clearInterval(timerInterval); display.innerText = "00:00"; } 
+                else { display.innerText = formatTime(rem); }
             }, 100);
         }
     </script>
