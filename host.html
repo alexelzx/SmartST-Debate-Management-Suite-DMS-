@@ -26,6 +26,9 @@
         .queue-badge { font-size: 0.65rem; background: var(--text-color); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 0.5rem; }
         .master-control { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; grid-column: span 2; display: flex; justify-content: space-between; align-items: center; }
         .master-timer { font-size: 2rem; font-family: monospace; font-weight: bold; }
+        .broadcast-panel { background: var(--text-color); color: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; grid-column: span 2; display: flex; align-items: center; gap: 1rem; }
+        .broadcast-panel input { margin: 0; flex: 1; border: none; background: rgba(255,255,255,0.1); color: #fff; }
+        .broadcast-panel input::placeholder { color: rgba(255,255,255,0.5); }
     </style>
 </head>
 <body>
@@ -66,6 +69,13 @@
                 </div>
             </div>
 
+            <div class="broadcast-panel">
+                <div style="font-family: 'Playfair Display', serif; font-size: 1.2rem; min-width: 150px;">Educator Mode</div>
+                <input type="text" id="educatorMsg" placeholder="Transmit a global directive, tip, or reminder...">
+                <button class="btn-success" onclick="broadcastMessage()">Transmit</button>
+                <button class="btn-outline" style="border-color: rgba(255,255,255,0.3); color: #fff;" onclick="clearBroadcast()">Clear</button>
+            </div>
+
             <div class="panel" style="grid-column: span 2;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h3>Roster & Disciplinary Control</h3>
@@ -97,7 +107,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot, arrayRemove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0", authDomain: "smartst-debate.firebaseapp.com", projectId: "smartst-debate", storageBucket: "smartst-debate.firebasestorage.app", messagingSenderId: "128238171772", appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9" };
         const app = initializeApp(firebaseConfig);
@@ -130,7 +140,7 @@
 
             await setDoc(doc(db, "debates", sessionCode), {
                 theme: document.getElementById('initTheme').value || "General Debate",
-                globalStatus: "waiting", globalRemainingMs: totalMs, globalEndTimeMs: null, isExtraTime: false,
+                globalStatus: "waiting", globalRemainingMs: totalMs, globalEndTimeMs: null, isExtraTime: false, educatorMessage: "",
                 queue: [], activeSpeakerId: null, activeSpeakerName: "Floor Open", isTimerRunning: false, endTimeMs: null
             });
             document.getElementById('init-state').style.display = 'none';
@@ -166,6 +176,16 @@
             appendLog("MASTER COMMAND: +5 MIN EXTRA TIME AUTHORIZED");
         };
 
+        window.broadcastMessage = async () => {
+            const msg = document.getElementById('educatorMsg').value.trim();
+            if(msg) { await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: msg }); appendLog(`BROADCAST: ${msg}`); }
+        };
+
+        window.clearBroadcast = async () => {
+            document.getElementById('educatorMsg').value = '';
+            await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: "" }); appendLog(`BROADCAST CLEARED`);
+        };
+
         function initSync() {
             let oldQueue = [];
             onSnapshot(doc(db, "debates", sessionCode), (s) => {
@@ -173,7 +193,6 @@
                     const d = s.data();
                     currentQueue = d.queue || [];
                     
-                    // Highly Sensitive Queue Logging
                     currentQueue.forEach(id => {
                         if(!oldQueue.includes(id) && pData[id]) appendLog(`PAROLE REQUESTED: ${pData[id].name}`);
                     });
@@ -218,7 +237,11 @@
                     }
                 });
                 pData = {}; snap.forEach(d => pData[d.id] = d.data()); 
-                document.getElementById('totalConnected').innerText = `CONNECTED: ${Object.keys(pData).length}`;
+                
+                // Properly filter out kicked users for the accurate connection count
+                const activeCount = Object.values(pData).filter(p => !p.kicked).length;
+                document.getElementById('totalConnected').innerText = `CONNECTED: ${activeCount}`;
+                
                 renderRoster();
             });
         }
@@ -260,6 +283,7 @@
                 <div style="display:flex; gap:0.3rem;">
                     <button class="btn-grade" onclick="adjustPoint('${pid}', 1)">+1</button>
                     <button class="btn-outline" style="background:#ddd;" onclick="adjustPoint('${pid}', -1)">-1</button>
+                    <button class="btn-outline" onclick="directMessage('${pid}')">Msg</button>
                     <button class="btn-success" onclick="grantParole('${pid}')">Parole</button>
                     <button class="btn-warn" onclick="issueWarn('${pid}')">Warn</button>
                     <button class="btn-danger" onclick="issueStrike('${pid}')">Strike</button>
@@ -281,6 +305,14 @@
         
         window.revokeFloor = async () => { await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open" }); appendLog("FLOOR REVOKED"); };
         
+        window.directMessage = async (pid) => {
+            const m = prompt(`Direct private message to ${pData[pid].name}:`);
+            if(m) {
+                await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { directMessage: m });
+                appendLog(`DIRECT MSG: Sent to ${pData[pid].name}`);
+            }
+        };
+
         window.issueWarn = async (pid) => { 
             const m = prompt("Warning Directive:"); 
             if(m) { 
