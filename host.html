@@ -4,102 +4,134 @@
     <meta charset="UTF-8">
     <title>SmartST DMS - Executive Host</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@400;600&display=swap');
-        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; --accent: #2c3e50; --warn: #ea580c; }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@400;600;700&display=swap');
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.15); --danger: #b3261e; --success: #16a34a; --accent: #2c3e50; --warn: #ea580c; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-color); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        nav { padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
-        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        .panel { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        .log-box { background: #1e1e1e; color: #a3a3a3; font-family: monospace; padding: 1rem; height: 250px; overflow-y: auto; border-radius: 8px; font-size: 0.8rem; line-height: 1.5; margin-bottom: 1rem; }
-        .participant-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border); background: #faf9f7; border-radius: 8px; margin-bottom: 0.5rem; }
-        button { padding: 0.5rem 0.8rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; }
+        
+        /* Navigation */
+        nav { padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        
+        /* Core Layout */
+        .container { padding: 3rem 2rem; max-width: 1600px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .panel { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 2rem; }
+        
+        /* Initialization State */
+        #init-state { max-width: 600px; margin: 5rem auto; text-align: center; }
+        
+        /* Active State Layout */
+        #active-state { display: none; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: #fff; padding: 1.5rem 2rem; border-radius: 12px; border: 2px solid var(--text-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .session-code-display { font-family: monospace; font-size: 3rem; font-weight: bold; letter-spacing: 5px; color: var(--text-color); margin: 0; line-height: 1; }
+        
+        .grid-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 2rem; align-items: start; }
+        
+        /* Typography & Inputs */
+        h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-top: 0; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+        input, select { padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 1rem; font-family: 'Inter', sans-serif; }
+        
+        /* Buttons */
+        button { padding: 0.6rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.4rem; justify-content: center; }
+        button:hover { opacity: 0.85; transform: translateY(-1px); }
         .btn-primary { background: var(--text-color); color: #fff; }
         .btn-success { background: var(--success); color: #fff; }
         .btn-danger { background: var(--danger); color: #fff; }
         .btn-warn { background: var(--warn); color: #fff; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: #1c1c1c; }
         .btn-grade { background: var(--accent); color: #fff; }
-        input, select { padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 1rem; font-family: 'Inter', sans-serif; }
-        #init-state { max-width: 600px; margin: 5rem auto; text-align: center; }
-        #active-state { display: none; }
-        .queue-badge { font-size: 0.65rem; background: var(--text-color); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 0.5rem; }
-        .master-control { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; grid-column: span 2; display: flex; justify-content: space-between; align-items: center; }
-        .master-timer { font-size: 2rem; font-family: monospace; font-weight: bold; }
-        .broadcast-panel { background: var(--text-color); color: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; grid-column: span 2; display: flex; align-items: center; gap: 1rem; }
-        .broadcast-panel input { margin: 0; flex: 1; border: none; background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* Specific Modules */
+        .master-timer { font-size: 2.5rem; font-family: monospace; font-weight: bold; }
+        .broadcast-panel { background: var(--text-color); color: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; }
+        .broadcast-panel input { margin: 0; flex: 1; border: none; background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem; }
         .broadcast-panel input::placeholder { color: rgba(255,255,255,0.5); }
+        
+        /* Roster & Logs */
+        .participant-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border); background: #faf9f7; border-radius: 8px; margin-bottom: 0.5rem; }
+        .queue-badge { font-size: 0.65rem; background: var(--text-color); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 0.5rem; }
+        .log-box { background: #1e1e1e; color: #a3a3a3; font-family: monospace; padding: 1.5rem; height: 300px; overflow-y: auto; border-radius: 8px; font-size: 0.8rem; line-height: 1.6; margin-bottom: 2rem; border: 1px solid #000; box-shadow: inset 0 5px 15px rgba(0,0,0,0.5); }
+        .log-entry { margin-bottom: 0.5rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo">SmartST Executive Host</div>
+        <div class="logo">🏛️ SmartST Executive Host</div>
         <div style="display: flex; gap: 1rem;">
-            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">TV View</button>
-            <button class="btn-outline" onclick="handleLogout()">Logout</button>
+            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">📺 Launch TV View</button>
+            <button class="btn-outline" onclick="handleLogout()">🚪 Terminate</button>
         </div>
     </nav>
 
     <div class="container">
-        <div id="init-state" class="panel" style="grid-column: span 2;">
-            <h2>Initialize Framework</h2>
+        <div id="init-state" class="panel">
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; margin-top: 0;">⚙️ Initialize Framework</h2>
             <input type="text" id="initTheme" placeholder="Resolution / Theme">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <input type="number" id="totalTimer" placeholder="Total Debate Duration (Min)" value="60">
-                <input type="number" id="baseTimer" placeholder="Default Speaker Timer (Min)" value="5">
+                <input type="number" id="totalTimer" placeholder="Total Debate (Min)" value="60">
+                <input type="number" id="baseTimer" placeholder="Default Speaker (Min)" value="5">
             </div>
-            <button class="btn-primary" style="width: 100%;" onclick="generateSession()">Deploy Secure Environment</button>
+            <button class="btn-primary" style="width: 100%; padding: 1rem;" onclick="generateSession()">🚀 Deploy Secure Environment</button>
         </div>
 
-        <div id="active-state" style="display: none; grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div id="active-state">
             
-            <div class="master-control">
+            <div class="dashboard-header">
                 <div>
-                    <h3 style="margin: 0 0 0.5rem 0;">Global Master Control</h3>
-                    <div id="globalStatusDisplay" style="color: var(--danger); font-weight: bold; text-transform: uppercase;">Awaiting Start</div>
+                    <div style="font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.5rem;">🔑 Access Protocol</div>
+                    <div class="session-code-display" id="displayCode">------</div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div class="master-timer" id="hostMasterTimer">00:00:00</div>
-                    <button class="btn-outline" onclick="addExtraTime()">+5 Min</button>
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn-success" id="btnMasterStart" onclick="toggleMasterStatus('active')">Start Debate</button>
-                    <button class="btn-warn" id="btnMasterPause" style="display: none;" onclick="toggleMasterStatus('paused')">Pause Debate</button>
-                    <button class="btn-danger" id="btnMasterEnd" style="display: none;" onclick="toggleMasterStatus('ended')">End Debate</button>
+                <div style="text-align: right;">
+                    <div id="globalStatusDisplay" style="color: var(--danger); font-weight: bold; text-transform: uppercase; font-size: 1.2rem;">🔴 Awaiting Start</div>
+                    <div id="totalConnected" style="font-size: 0.9rem; color: var(--success); font-weight: 600; margin-top: 0.5rem;">🟢 CONNECTED: 0</div>
                 </div>
             </div>
 
-            <div class="broadcast-panel">
-                <div style="font-family: 'Playfair Display', serif; font-size: 1.2rem; min-width: 150px;">Educator Mode</div>
-                <input type="text" id="educatorMsg" placeholder="Transmit a global directive, tip, or reminder...">
-                <button class="btn-success" onclick="broadcastMessage()">Transmit</button>
-                <button class="btn-outline" style="border-color: rgba(255,255,255,0.3); color: #fff;" onclick="clearBroadcast()">Clear</button>
-            </div>
+            <div class="grid-layout">
+                <div class="left-column">
+                    
+                    <div class="panel" style="display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--text-color);">
+                        <div>
+                            <h3 style="border: none; margin: 0; padding: 0;">🌍 Master Control</h3>
+                            <div class="master-timer" id="hostMasterTimer">00:00:00</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-success" id="btnMasterStart" onclick="toggleMasterStatus('active')">▶️ Start</button>
+                                <button class="btn-warn" id="btnMasterPause" style="display: none;" onclick="toggleMasterStatus('paused')">⏸️ Pause</button>
+                                <button class="btn-danger" id="btnMasterEnd" style="display: none;" onclick="toggleMasterStatus('ended')">⏹️ End</button>
+                            </div>
+                            <button class="btn-outline" style="width: 100%;" onclick="addExtraTime()">⏳ +5 Min Extra</button>
+                        </div>
+                    </div>
 
-            <div class="panel" style="grid-column: span 2;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h3>Roster & Disciplinary Control</h3>
-                    <div style="text-align: right;">
-                        <div id="codeDisplay" style="font-weight: bold; letter-spacing: 2px;">CODE: ------</div>
-                        <div id="totalConnected" style="font-size: 0.8rem; color: var(--success); font-weight: 600; margin-top: 0.5rem;">CONNECTED: 0</div>
+                    <div class="broadcast-panel">
+                        <div style="font-family: 'Playfair Display', serif; font-size: 1.2rem; min-width: 150px;">📢 Educator Mode</div>
+                        <input type="text" id="educatorMsg" placeholder="Transmit a global directive...">
+                        <button class="btn-success" onclick="broadcastMessage()">📨 Send</button>
+                        <button class="btn-outline" style="border-color: rgba(255,255,255,0.3); color: #fff;" onclick="clearBroadcast()">🧹 Clear</button>
+                    </div>
+
+                    <div class="panel">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+                            <h3 style="margin: 0; border: none;">👥 Roster & Discipline</h3>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <input type="number" id="manualTimer" placeholder="Override Min" style="margin: 0; width: 120px;">
+                                <button class="btn-danger" onclick="revokeFloor()">🛑 Halt Speaker</button>
+                            </div>
+                        </div>
+                        <div id="participantList"></div>
                     </div>
                 </div>
-                <div style="margin-bottom: 1.5rem;">
-                    <label style="font-size: 0.75rem; text-transform: uppercase; color: #888;">Override Parole Duration (Min)</label>
-                    <input type="number" id="manualTimer" placeholder="Minutes" style="margin-top: 0.5rem; width: 100px; display: inline-block; margin-right: 1rem;">
-                    <button class="btn-danger" onclick="revokeFloor()">Halt Current Speaker</button>
+
+                <div class="right-column">
+                    <div class="panel" style="background: #faf9f7;">
+                        <h3>📝 Executive Audit Log</h3>
+                        <div class="log-box" id="fullLog"></div>
+                        
+                        <h3 style="color: var(--danger); border-color: rgba(179, 38, 30, 0.2);">🚨 Disciplinary Log</h3>
+                        <div class="log-box" id="warnLog" style="border-left: 4px solid var(--danger); height: 200px;"></div>
+                    </div>
                 </div>
-                <div id="participantList"></div>
-            </div>
-
-            <div class="panel">
-                <h3>Executive Audit Log</h3>
-                <div class="log-box" id="fullLog"></div>
-            </div>
-
-            <div class="panel">
-                <h3 style="color: var(--danger);">Disciplinary Log</h3>
-                <div class="log-box" id="warnLog" style="border-left: 4px solid var(--danger);"></div>
             </div>
         </div>
     </div>
@@ -117,38 +149,67 @@
         let sessionCode = null, pData = {}, currentQueue = [], masterTimerInterval;
         let globalRemainingMs = 0;
 
-        onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "auth.html"; });
+        // Secure Entry Verification
+        const urlParams = new URLSearchParams(window.location.search);
+        const isModJoin = urlParams.get('role') === 'moderator';
+        const sessionParam = urlParams.get('code');
+
+        onAuthStateChanged(auth, (user) => { 
+            const hasModPermission = sessionParam ? localStorage.getItem(`mod_auth_${sessionParam}`) === "true" : false;
+            if (!user && !hasModPermission) { 
+                window.location.href = "auth.html"; 
+                return;
+            }
+            
+            // Re-attach to existing session if joining as verified Moderator
+            if (isModJoin && sessionParam) {
+                sessionCode = sessionParam;
+                document.getElementById('displayCode').innerText = sessionCode;
+                document.getElementById('init-state').style.display = 'none';
+                document.getElementById('active-state').style.display = 'block';
+                document.getElementById('tvBtn').style.display = 'inline-flex';
+                initSync();
+            }
+        });
+
         window.handleLogout = () => signOut(auth).then(() => window.location.href = "index.html");
         window.launchTV = () => window.open(`tv.html?code=${sessionCode}`, 'Projector', 'width=1280,height=720');
 
         function appendLog(action) {
             const t = new Date().toLocaleTimeString();
-            document.getElementById('fullLog').innerHTML = `<div><span style="color:#818cf8">[${t}]</span> <strong>${action}</strong></div>` + document.getElementById('fullLog').innerHTML;
+            document.getElementById('fullLog').innerHTML = `<div class="log-entry"><span style="color:#818cf8">[${t}]</span> <strong>${action}</strong></div>` + document.getElementById('fullLog').innerHTML;
         }
 
         function appendWarnLog(action) {
             const t = new Date().toLocaleTimeString();
-            document.getElementById('warnLog').innerHTML = `<div><span style="color:var(--danger)">[${t}]</span> <strong>${action}</strong></div>` + document.getElementById('warnLog').innerHTML;
+            document.getElementById('warnLog').innerHTML = `<div class="log-entry"><span style="color:var(--danger)">[${t}]</span> <strong>${action}</strong></div>` + document.getElementById('warnLog').innerHTML;
         }
 
         window.generateSession = async () => {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let code = ''; for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-            sessionCode = code;
-            
-            const totalMs = (parseInt(document.getElementById('totalTimer').value) || 60) * 60000;
+            try {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = ''; for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+                sessionCode = code;
+                
+                const totalMs = (parseInt(document.getElementById('totalTimer').value) || 60) * 60000;
 
-            await setDoc(doc(db, "debates", sessionCode), {
-                theme: document.getElementById('initTheme').value || "General Debate",
-                globalStatus: "waiting", globalRemainingMs: totalMs, globalEndTimeMs: null, isExtraTime: false, educatorMessage: "",
-                queue: [], activeSpeakerId: null, activeSpeakerName: "Floor Open", isTimerRunning: false, endTimeMs: null, speakerRemainingMs: null
-            });
-            document.getElementById('init-state').style.display = 'none';
-            document.getElementById('active-state').style.display = 'grid';
-            document.getElementById('tvBtn').style.display = 'block';
-            document.getElementById('codeDisplay').innerText = `CODE: ${code}`;
-            appendLog(`SESSION INITIALIZED: ${code}`);
-            initSync();
+                await setDoc(doc(db, "debates", sessionCode), {
+                    theme: document.getElementById('initTheme').value || "General Debate",
+                    globalStatus: "waiting", globalRemainingMs: totalMs, globalEndTimeMs: null, isExtraTime: false, educatorMessage: "",
+                    queue: [], activeSpeakerId: null, activeSpeakerName: "Floor Open", isTimerRunning: false, endTimeMs: null, speakerRemainingMs: null
+                });
+                
+                // UI Transition
+                document.getElementById('init-state').style.display = 'none';
+                document.getElementById('active-state').style.display = 'block';
+                document.getElementById('tvBtn').style.display = 'inline-flex';
+                document.getElementById('displayCode').innerText = sessionCode;
+                
+                appendLog(`🚀 SESSION DEPLOYED: ${code}`);
+                initSync();
+            } catch (error) {
+                alert(`Execution Failed: Please ensure Firestore security rules are correctly published. Error: ${error.message}`);
+            }
         };
 
         window.toggleMasterStatus = async (status) => {
@@ -166,7 +227,7 @@
                     update.endTimeMs = Date.now() + d.speakerRemainingMs;
                     update.speakerRemainingMs = null;
                 }
-                appendLog("MASTER COMMAND: DEBATE COMMENCED");
+                appendLog("▶️ MASTER COMMAND: DEBATE COMMENCED");
             } else if (status === 'paused') {
                 update = { globalStatus: "paused", globalRemainingMs: globalRemainingMs, globalEndTimeMs: null };
                 if (d.isTimerRunning && d.endTimeMs) {
@@ -174,10 +235,10 @@
                     update.speakerRemainingMs = d.endTimeMs - Date.now();
                     update.endTimeMs = null;
                 }
-                appendLog("MASTER COMMAND: DEBATE PAUSED");
+                appendLog("⏸️ MASTER COMMAND: DEBATE PAUSED");
             } else if (status === 'ended') {
                 update = { globalStatus: "ended", globalRemainingMs: 0, globalEndTimeMs: null, isTimerRunning: false, endTimeMs: null, speakerRemainingMs: null };
-                appendLog("MASTER COMMAND: DEBATE TERMINATED");
+                appendLog("⏹️ MASTER COMMAND: DEBATE TERMINATED");
             }
             await updateDoc(ref, update);
         };
@@ -186,21 +247,21 @@
             const ref = doc(db, "debates", sessionCode);
             globalRemainingMs += 300000; // 5 mins
             const updateObj = { isExtraTime: true, globalRemainingMs: globalRemainingMs };
-            if (document.getElementById('globalStatusDisplay').innerText === "Debate Live" || document.getElementById('globalStatusDisplay').innerText === "Extra Time") {
+            if (document.getElementById('globalStatusDisplay').innerText.includes("LIVE") || document.getElementById('globalStatusDisplay').innerText.includes("EXTRA")) {
                 updateObj.globalEndTimeMs = Date.now() + globalRemainingMs;
             }
             await updateDoc(ref, updateObj);
-            appendLog("MASTER COMMAND: +5 MIN EXTRA TIME AUTHORIZED");
+            appendLog("⏳ MASTER COMMAND: +5 MIN EXTRA TIME AUTHORIZED");
         };
 
         window.broadcastMessage = async () => {
             const msg = document.getElementById('educatorMsg').value.trim();
-            if(msg) { await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: msg }); appendLog(`BROADCAST: ${msg}`); }
+            if(msg) { await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: msg }); appendLog(`📢 BROADCAST: ${msg}`); }
         };
 
         window.clearBroadcast = async () => {
             document.getElementById('educatorMsg').value = '';
-            await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: "" }); appendLog(`BROADCAST CLEARED`);
+            await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: "" }); appendLog(`🧹 BROADCAST CLEARED`);
         };
 
         function initSync() {
@@ -211,26 +272,26 @@
                     currentQueue = d.queue || [];
                     
                     currentQueue.forEach(id => {
-                        if(!oldQueue.includes(id) && pData[id]) appendLog(`PAROLE REQUESTED: ${pData[id].name}`);
+                        if(!oldQueue.includes(id) && pData[id]) appendLog(`🎤 PAROLE REQUESTED: ${pData[id].name}`);
                     });
                     oldQueue = currentQueue;
                     
                     const statusDisp = document.getElementById('globalStatusDisplay');
                     if(d.globalStatus === 'active') {
-                        statusDisp.innerText = d.isExtraTime ? "Extra Time" : "Debate Live";
+                        statusDisp.innerText = d.isExtraTime ? "🟢 Extra Time" : "🟢 Debate Live";
                         statusDisp.style.color = "var(--success)";
                         document.getElementById('btnMasterStart').style.display = 'none';
-                        document.getElementById('btnMasterPause').style.display = 'block';
-                        document.getElementById('btnMasterEnd').style.display = 'block';
+                        document.getElementById('btnMasterPause').style.display = 'inline-flex';
+                        document.getElementById('btnMasterEnd').style.display = 'inline-flex';
                     } else if (d.globalStatus === 'paused') {
-                        statusDisp.innerText = "Debate Paused";
+                        statusDisp.innerText = "⏸️ Debate Paused";
                         statusDisp.style.color = "var(--warn)";
-                        document.getElementById('btnMasterStart').style.display = 'block';
+                        document.getElementById('btnMasterStart').style.display = 'inline-flex';
                         document.getElementById('btnMasterPause').style.display = 'none';
-                        document.getElementById('btnMasterStart').innerText = "Resume Debate";
+                        document.getElementById('btnMasterStart').innerHTML = "▶️ Resume";
                         globalRemainingMs = d.globalRemainingMs;
                     } else if (d.globalStatus === 'ended') {
-                        statusDisp.innerText = "Debate Concluded";
+                        statusDisp.innerText = "⏹️ Debate Concluded";
                         statusDisp.style.color = "var(--danger)";
                         document.getElementById('btnMasterStart').style.display = 'none';
                         document.getElementById('btnMasterPause').style.display = 'none';
@@ -247,16 +308,16 @@
                 snap.docChanges().forEach((change) => {
                     const data = change.doc.data();
                     if (change.type === "added" && !pData[change.doc.id]) {
-                        appendLog(`CONNECTION: ${data.name} joined the forum.`);
+                        appendLog(`🔗 CONNECTION: ${data.name} joined the forum.`);
                     }
                     if (change.type === "removed") {
-                        if(!data.kicked) appendLog(`DISCONNECTION: ${data.name} left the forum.`);
+                        if(!data.kicked) appendLog(`🔌 DISCONNECTION: ${data.name} left the forum.`);
                     }
                 });
                 pData = {}; snap.forEach(d => pData[d.id] = d.data()); 
                 
                 const activeCount = Object.values(pData).filter(p => !p.kicked).length;
-                document.getElementById('totalConnected').innerText = `CONNECTED: ${activeCount}`;
+                document.getElementById('totalConnected').innerText = `🟢 CONNECTED: ${activeCount}`;
                 
                 renderRoster();
             });
@@ -276,7 +337,7 @@
             masterTimerInterval = setInterval(() => {
                 globalRemainingMs = endMs - Date.now();
                 display.innerText = formatTime(globalRemainingMs);
-                if (globalRemainingMs <= 0 && document.getElementById('globalStatusDisplay').innerText !== "Debate Concluded") {
+                if (globalRemainingMs <= 0 && document.getElementById('globalStatusDisplay').innerText !== "⏹️ Debate Concluded") {
                     toggleMasterStatus('ended');
                 }
             }, 500);
@@ -293,39 +354,41 @@
             let badge = qPos ? `<span class="queue-badge">Q#${qPos}</span>` : '';
             row.innerHTML = `
                 <div style="flex:1;">
-                    <strong>${data.name}${badge}</strong> <span style="color:var(--success); font-weight:bold;">(${data.points || 0} PT)</span> <span style="color:var(--danger); font-weight:bold;">[${data.strikes || 0} STRIKES]</span><br>
+                    <strong>${data.name}${badge}</strong> 
+                    <span style="color:var(--success); font-weight:bold; margin-left:0.5rem;">(${data.points || 0} PT)</span> 
+                    <span style="color:var(--danger); font-weight:bold; margin-left:0.5rem;">[${data.strikes || 0} STRIKES]</span><br>
                     <small>${data.side} | ${data.team || '--'}</small>
                 </div>
-                <div style="display:flex; gap:0.3rem;">
-                    <button class="btn-grade" onclick="adjustPoint('${pid}', 1)">+1</button>
-                    <button class="btn-outline" style="background:#ddd;" onclick="adjustPoint('${pid}', -1)">-1</button>
-                    <button class="btn-outline" onclick="directMessage('${pid}')">Msg</button>
-                    <button class="btn-success" onclick="grantParole('${pid}')">Parole</button>
-                    <button class="btn-warn" onclick="issueWarn('${pid}')">Warn</button>
-                    <button class="btn-danger" onclick="issueStrike('${pid}')">Strike</button>
-                    <button class="btn-outline" style="border-color:var(--danger); color:var(--danger);" onclick="kickUser('${pid}')">Kick</button>
+                <div style="display:flex; flex-wrap: wrap; gap:0.4rem; justify-content: flex-end;">
+                    <button class="btn-grade" onclick="adjustPoint('${pid}', 1)">➕1</button>
+                    <button class="btn-outline" style="background:#e5e7eb;" onclick="adjustPoint('${pid}', -1)">➖1</button>
+                    <button class="btn-outline" onclick="directMessage('${pid}')">💬 Msg</button>
+                    <button class="btn-success" onclick="grantParole('${pid}')">🎤 Parole</button>
+                    <button class="btn-warn" onclick="issueWarn('${pid}')">⚠️ Warn</button>
+                    <button class="btn-danger" onclick="issueStrike('${pid}')">❌ Strike</button>
+                    <button class="btn-outline" style="border-color:var(--danger); color:var(--danger);" onclick="kickUser('${pid}')">👢 Kick</button>
                 </div>`;
             return row;
         }
 
         window.adjustPoint = async (pid, val) => { 
             await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { points: (pData[pid].points || 0) + val }); 
-            appendLog(`ACCOLADE: ${val > 0 ? '+1' : '-1'} Point to ${pData[pid].name}`); 
+            appendLog(`🏆 ACCOLADE: ${val > 0 ? '+1' : '-1'} Point to ${pData[pid].name}`); 
         };
         
         window.grantParole = async (pid) => { 
             const mins = parseInt(document.getElementById('manualTimer').value) || parseInt(document.getElementById('baseTimer').value) || 5; 
             await updateDoc(doc(db, "debates", sessionCode), { activeSpeakerId: pid, activeSpeakerName: pData[pid].name, activeTeam: pData[pid].team, activeSide: pData[pid].side, endTimeMs: Date.now() + (mins * 60000), isTimerRunning: true, queue: arrayRemove(pid) }); 
-            appendLog(`PAROLE GRANTED: ${pData[pid].name}`); 
+            appendLog(`🎤 PAROLE GRANTED: ${pData[pid].name}`); 
         };
         
-        window.revokeFloor = async () => { await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open" }); appendLog("FLOOR REVOKED"); };
+        window.revokeFloor = async () => { await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open" }); appendLog("🛑 FLOOR REVOKED"); };
         
         window.directMessage = async (pid) => {
             const m = prompt(`Direct private message to ${pData[pid].name}:`);
             if(m) {
                 await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { directMessage: m });
-                appendLog(`DIRECT MSG: Sent to ${pData[pid].name}`);
+                appendLog(`💬 DIRECT MSG: Sent to ${pData[pid].name}`);
             }
         };
 
@@ -333,8 +396,8 @@
             const m = prompt("Warning Directive:"); 
             if(m) { 
                 await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: m }); 
-                appendLog(`WARNING ISSUED: ${pData[pid].name}`);
-                appendWarnLog(`WARN -> ${pData[pid].name}: ${m}`);
+                appendLog(`⚠️ WARNING ISSUED: ${pData[pid].name}`);
+                appendWarnLog(`⚠️ WARN -> ${pData[pid].name}: ${m}`);
             } 
         };
         
@@ -343,8 +406,8 @@
             if(m) {
                 const currentStrikes = (pData[pid].strikes || 0) + 1;
                 await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { strikes: currentStrikes, strikeMessage: m });
-                appendLog(`STRIKE ISSUED: ${pData[pid].name} (Count: ${currentStrikes})`);
-                appendWarnLog(`STRIKE [${currentStrikes}/3] -> ${pData[pid].name}: ${m}`);
+                appendLog(`❌ STRIKE ISSUED: ${pData[pid].name} (Count: ${currentStrikes})`);
+                appendWarnLog(`❌ STRIKE [${currentStrikes}/3] -> ${pData[pid].name}: ${m}`);
                 if (currentStrikes >= 3) kickUser(pid);
             }
         };
@@ -353,8 +416,8 @@
             if(confirm(`Are you certain you wish to permanently expel ${pData[pid].name}?`)) {
                 await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { kicked: true });
                 await updateDoc(doc(db, "debates", sessionCode), { queue: arrayRemove(pid) });
-                appendLog(`EXPULSION: ${pData[pid].name} has been kicked.`);
-                appendWarnLog(`KICKED -> ${pData[pid].name}`);
+                appendLog(`👢 EXPULSION: ${pData[pid].name} has been kicked.`);
+                appendWarnLog(`👢 KICKED -> ${pData[pid].name}`);
             }
         };
     </script>
