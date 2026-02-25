@@ -114,21 +114,29 @@
         }
 
         function renderRoster() {
-            const div = document.getElementById('participantList'); div.innerHTML = '';
+            const div = document.getElementById('participantList'); 
+            div.innerHTML = '';
             let rendered = new Set();
+            
+            // Render queued participants first
             currentQueue.forEach((pid, idx) => {
                 if(pData[pid]){
                     div.appendChild(createRow(pid, pData[pid], idx + 1));
                     rendered.add(pid);
                 }
             });
+            
+            // Render non-queued participants
             for (let pid in pData) {
-                if (!renderedIds.has(pid)) div.appendChild(createRow(pid, pData[pid], null));
+                if (!rendered.has(pid)) {
+                    div.appendChild(createRow(pid, pData[pid], null));
+                }
             }
         }
 
         function createRow(pid, data, qPos) {
-            const row = document.createElement('div'); row.className = 'participant-row';
+            const row = document.createElement('div'); 
+            row.className = 'participant-row';
             let badge = qPos ? `<span class="queue-badge">Q#${qPos}</span>` : '';
             row.innerHTML = `
                 <div><strong>${data.name}${badge}</strong><br><small>${data.side} | ${data.team || '--'}</small></div>
