@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartST DMS - Projector View</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@300;400;500;600&display=swap');
         :root { --bg-overlay: rgba(244, 242, 237, 0.94); --text-color: #1C1C1C; --text-muted: #666666; --border: rgba(28, 28, 28, 0.1); --danger: #b3261e; }
         body { margin: 0; color: var(--text-color); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; background: url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; display: flex; flex-direction: column; }
         .bg-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-overlay); backdrop-filter: blur(15px); z-index: -1; }
+        
+        #educatorBanner { background: var(--text-color); color: #fff; padding: 1.5rem; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; font-size: 1.5rem; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 50; }
+        
         nav { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.3); }
         .logo { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 600; }
         .session-badge { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-muted); padding: 0.8rem 1.5rem; border: 2px solid var(--border); border-radius: 50px; }
@@ -30,6 +32,9 @@
 </head>
 <body>
     <div class="bg-overlay"></div>
+    
+    <div id="educatorBanner">📢 EDUCATOR DIRECTIVE: <span></span></div>
+
     <nav>
         <div class="logo">SmartST.</div>
         <div class="session-badge" id="codeDisplay">SESSION: ---</div>
@@ -48,7 +53,7 @@
     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, collection, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
         const firebaseConfig = { apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0", authDomain: "smartst-debate.firebaseapp.com", projectId: "smartst-debate", storageBucket: "smartst-debate.firebasestorage.app", messagingSenderId: "128238171772", appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -61,16 +66,24 @@
             const debateRef = doc(db, "debates", joinCode);
             const partsRef = collection(db, "debates", joinCode, "participants");
 
-            // Sync Participant Names for Queue mapping
             onSnapshot(partsRef, (snap) => {
                 snap.forEach(d => pNames[d.id] = d.data().name);
-                // Refresh queue if data already exists
                 getDoc(debateRef).then(s => { if(s.exists()) renderQueue(s.data().queue || []); });
             });
 
             onSnapshot(debateRef, (s) => {
                 if (s.exists()) {
                     const data = s.data();
+                    
+                    // Educator Banner Logic
+                    const edBanner = document.getElementById('educatorBanner');
+                    if (data.educatorMessage && data.educatorMessage.trim() !== "") {
+                        edBanner.querySelector('span').innerText = data.educatorMessage;
+                        edBanner.style.display = 'block';
+                    } else {
+                        edBanner.style.display = 'none';
+                    }
+
                     document.getElementById('themeDisplay').innerText = data.theme || "General Resolution";
                     document.getElementById('speakerDisplay').innerText = data.activeSpeakerName || "Floor Open";
                     document.getElementById('teamDisplay').innerText = `${data.activeSide || '--'} | ${data.activeTeam || '--'}`;
@@ -81,8 +94,7 @@
         }
 
         function renderQueue(queueArray) {
-            const list = document.getElementById('queueList');
-            list.innerHTML = '';
+            const list = document.getElementById('queueList'); list.innerHTML = '';
             queueArray.forEach((pid, idx) => {
                 const name = pNames[pid] || "Identifying...";
                 list.innerHTML += `<div class="queue-item"><div class="queue-pos">${idx + 1}</div><div class="queue-name">${name}</div></div>`;
