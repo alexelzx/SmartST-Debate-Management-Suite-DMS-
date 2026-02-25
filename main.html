@@ -12,6 +12,7 @@
             --text-color: #1C1C1C;
             --text-muted: #555555;
             --border-color: rgba(28, 28, 28, 0.15);
+            --accent: #2c3e50;
         }
 
         html { scroll-behavior: smooth; }
@@ -45,10 +46,10 @@
         }
 
         /* Navigation */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; border-bottom: 1px solid var(--border-color); }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; border-bottom: 1px solid var(--border-color); background: var(--bg-color); position: sticky; top: 0; z-index: 1000; }
         .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.5px; }
         .nav-links { display: flex; gap: 2.5rem; }
-        .nav-links a { text-decoration: none; color: var(--text-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.4s ease; }
+        .nav-links a { text-decoration: none; color: var(--text-color); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; transition: opacity 0.4s ease; }
         .nav-links a:hover { opacity: 0.5; }
 
         /* Hero Section */
@@ -58,7 +59,7 @@
         .subtitle { font-size: 1.15rem; color: var(--text-muted); font-weight: 300; margin: 0 auto 3rem auto; max-width: 700px; line-height: 1.8; }
 
         /* Image Display */
-        .image-wrapper { animation: gentleFloat 8s ease-in-out infinite; width: 100%; max-width: 1200px; margin: 0 auto 4rem auto; }
+        .image-wrapper { animation: gentleFloat 8s ease-in-out infinite; width: 100%; max-width: 1200px; margin: 0 auto 4rem auto; padding: 0 2rem; box-sizing: border-box; }
         .image-container { border-radius: 24px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.08); transform: translateZ(0); }
         .image-container img { width: 100%; height: 550px; object-fit: cover; object-position: center 60%; display: block; transition: transform 1.5s cubic-bezier(0.25, 1, 0.2, 1); }
         .image-container:hover img { transform: scale(1.04); }
@@ -68,42 +69,55 @@
         .btn-launch { background: var(--text-color); color: var(--bg-color); padding: 1.2rem 3.5rem; border: none; border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 1, 0.2, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .btn-launch:hover { background: #333; transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
 
-        /* Sections */
-        .info-section { max-width: 1200px; margin: 0 auto 4rem auto; padding: 4rem; border-top: 1px solid var(--border-color); }
-        .info-section h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 4rem; font-weight: 400; }
+        /* General Section Formatting */
+        .info-section { max-width: 1200px; margin: 0 auto; padding: 6rem 2rem; border-top: 1px solid var(--border-color); }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin: 0 0 1rem 0; font-weight: 400; }
+        .section-subtitle { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; }
         
-        /* Institutional Origin Card (Replaces "About the Architect") */
-        .origin-card { background: #fff; border: 1px solid rgba(28, 28, 28, 0.08); padding: 4rem; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.03); margin-bottom: 2rem; transition: transform 0.6s ease; }
+        /* 1. History Section */
+        .history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .history-text p { font-size: 1.1rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 1.5rem; text-align: justify; font-weight: 300; }
+        .history-text p strong { color: var(--text-color); font-weight: 500; }
+        .history-quote { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--text-color); line-height: 1.3; border-left: 2px solid var(--text-color); padding-left: 2rem; margin: 2rem 0; }
+
+        /* 2. Credits / Origins Card */
+        .origin-card { background: #fff; border: 1px solid rgba(28, 28, 28, 0.08); padding: 4rem; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.03); transition: transform 0.6s ease; }
         .origin-card:hover { transform: translateY(-5px); }
-        
         .origin-profile { display: grid; grid-template-columns: 1fr 200px; gap: 4rem; align-items: center; }
         .author-image-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
         .author-image { width: 160px; height: 160px; border-radius: 50%; box-shadow: 0 15px 35px rgba(0,0,0,0.1); object-fit: cover; object-position: center 20%; border: 4px solid var(--bg-color); transition: transform 0.6s ease; filter: grayscale(20%); }
         .author-image:hover { transform: scale(1.05); filter: grayscale(0%); }
-        
         .origin-bio p { color: var(--text-muted); font-weight: 300; font-size: 1.1rem; text-align: justify; margin-bottom: 1.8rem; line-height: 1.8; }
         .origin-bio strong { color: var(--text-color); font-weight: 500; }
-        
         .endorsement-block { display: flex; align-items: center; gap: 2rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
         .endorsement-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2.5px; color: var(--text-muted); font-weight: 600; }
         .endorsement-logo { height: 50px; width: auto; object-fit: contain; filter: opacity(0.8); transition: filter 0.4s ease; }
         .endorsement-logo:hover { filter: opacity(1); }
 
-        /* Tips Grid */
-        .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; }
-        .tip-card { background: transparent; border: 1px solid var(--border-color); padding: 3rem 2.5rem; border-radius: 16px; transition: all 0.6s cubic-bezier(0.25, 1, 0.2, 1); }
-        .tip-card:hover { transform: translateY(-8px); background: #ffffff; box-shadow: 0 20px 40px rgba(0,0,0,0.04); border-color: transparent; }
-        .tip-quote { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-style: italic; margin-bottom: 2rem; line-height: 1.5; color: var(--text-color); }
-        .tip-author { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+        /* 3. Tips & Tricks Grid */
+        .tactics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .tactic-card { background: var(--text-color); color: #fff; padding: 3rem 2.5rem; border-radius: 16px; transition: transform 0.6s cubic-bezier(0.25, 1, 0.2, 1); }
+        .tactic-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .tactic-number { font-family: monospace; font-size: 0.85rem; color: rgba(255,255,255,0.5); letter-spacing: 2px; margin-bottom: 1.5rem; display: block; }
+        .tactic-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin: 0 0 1rem 0; font-weight: 400; }
+        .tactic-desc { font-weight: 300; font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.8); margin: 0; }
 
-        footer { border-top: 1px solid var(--border-color); padding: 4rem; display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+        /* 4. Quotes Grid */
+        .quotes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; }
+        .quote-card { background: transparent; border: 1px solid var(--border-color); padding: 3rem 2.5rem; border-radius: 16px; transition: all 0.6s cubic-bezier(0.25, 1, 0.2, 1); }
+        .quote-card:hover { transform: translateY(-8px); background: #ffffff; box-shadow: 0 20px 40px rgba(0,0,0,0.04); border-color: transparent; }
+        .quote-text { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-style: italic; margin-bottom: 2rem; line-height: 1.5; color: var(--text-color); }
+        .quote-author { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
+
+        footer { border-top: 1px solid var(--border-color); padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
         .footer-links a { color: inherit; text-decoration: none; margin-left: 2.5rem; transition: color 0.3s; }
         .footer-links a:hover { color: var(--text-color); }
 
         @media (max-width: 900px) {
             h1 { font-size: 3.5rem; }
-            .info-section { padding: 2rem; }
             .nav-links { display: none; }
+            .history-grid { grid-template-columns: 1fr; gap: 2rem; }
             .origin-profile { grid-template-columns: 1fr; text-align: center; gap: 3rem; }
             .author-image-container { order: -1; }
             .origin-bio p { text-align: center; }
@@ -118,8 +132,9 @@
     <nav>
         <div class="logo">SmartST DMS.</div>
         <div class="nav-links">
-            <a href="#origins">Origins</a>
-            <a href="#insights">Insights</a>
+            <a href="#history">History</a>
+            <a href="#credits">Credits</a>
+            <a href="#tactics">Tactics</a>
             <a href="rdmp.html">Roadmap</a>
             <a href="index.html">Access Portal</a>
         </div>
@@ -140,8 +155,30 @@
         <button class="btn-launch" onclick="window.location.href='index.html'">Launch Debate Terminal</button>
     </div>
 
-    <section id="origins" class="info-section">
-        <h2 class="reveal">System Origins & Development</h2>
+    <section id="history" class="info-section">
+        <div class="section-header reveal">
+            <div class="section-subtitle">Contextual Heritage</div>
+            <h2 class="section-title">The Evolution of Debate</h2>
+        </div>
+        <div class="history-grid">
+            <div class="history-text reveal delay-1">
+                <p>From classical antiquity to modern institutional assemblies, structured debate has remained the fundamental mechanism for intellectual progress and executive decision-making. The ability to articulate, defend, and scrutinize ideas under pressure is the cornerstone of civilized administration.</p>
+                <p>However, as organizational structures have scaled, the logistical friction of managing these intellectual exchanges has increased. The reliance on manual chronometry and subjective moderation often disrupts the flow of pure argument.</p>
+            </div>
+            <div class="reveal delay-2">
+                <div class="history-quote">
+                    "The digitization of discourse is not about silencing voices; it is about ensuring every voice is measured, synchronized, and heard with absolute clarity."
+                </div>
+                <p class="history-text" style="color: var(--text-muted); font-size: 0.95rem; font-weight: 300;">The SmartST DMS eliminates this administrative friction. By centralizing the chronological and disciplinary framework into a low-latency cloud ecosystem, the platform allows participants to focus entirely on the substance of their rhetoric, leaving the orchestration to the system.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="credits" class="info-section">
+        <div class="section-header reveal">
+            <div class="section-subtitle">Architectural Framework</div>
+            <h2 class="section-title">System Origins & Credits</h2>
+        </div>
         <div class="origin-card reveal delay-1">
             <div class="origin-profile">
                 <div class="origin-bio">
@@ -157,27 +194,54 @@
                     </div>
                 </div>
                 <div class="author-image-container">
-                    <img src="author.png" alt="Architect Portrait" class="author-image">
+                    <img src="authorito.png" alt="Architect Portrait" class="author-image">
                     <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-top: 0.5rem;">Lead Architect</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="insights" class="info-section" style="border-top: none; padding-top: 0;">
-        <h2 class="reveal">Strategic Insights</h2>
-        <div class="tips-grid">
-            <div class="tip-card reveal delay-1">
-                <div class="tip-quote">"Don't raise your voice, improve your argument."</div>
-                <div class="tip-author">— Desmond Tutu</div>
+    <section id="tactics" class="info-section">
+        <div class="section-header reveal">
+            <div class="section-subtitle">Operational Strategy</div>
+            <h2 class="section-title">Executive Tactics</h2>
+        </div>
+        <div class="tactics-grid">
+            <div class="tactic-card reveal delay-1">
+                <span class="tactic-number">TACTIC 01</span>
+                <h3 class="tactic-title">Chronometric Discipline</h3>
+                <p class="tactic-desc">The digital timer is absolute. Structure your arguments to peak at the 80% mark of your allotted time, leaving the final 20% strictly for a conclusive, undeniable summary before the system silences the floor.</p>
             </div>
-            <div class="tip-card reveal delay-2">
-                <div class="tip-quote">"He who knows only his own side of the case knows little of that."</div>
-                <div class="tip-author">— John Stuart Mill</div>
+            <div class="tactic-card reveal delay-2">
+                <span class="tactic-number">TACTIC 02</span>
+                <h3 class="tactic-title">Strategic Mentioning</h3>
+                <p class="tactic-desc">Utilize the built-in bilateral `@mention` system within your workspace notes. Tracking the specific claims of rival debators by name allows for highly targeted and devastating rebuttals when granted parole.</p>
             </div>
-            <div class="tip-card reveal delay-3">
-                <div class="tip-quote">"The supreme art of war is to subdue the enemy without fighting."</div>
-                <div class="tip-author">— Sun Tzu</div>
+            <div class="tactic-card reveal delay-3">
+                <span class="tactic-number">TACTIC 03</span>
+                <h3 class="tactic-title">Queue Positioning</h3>
+                <p class="tactic-desc">Do not rush the parole queue. Analyze the flow of the debate on the Projector View. Requesting parole immediately after a weak opponent speaks creates a stark contrast in analytical competence.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="quotes" class="info-section">
+        <div class="section-header reveal">
+            <div class="section-subtitle">Historical Precedent</div>
+            <h2 class="section-title">Voices of Authority</h2>
+        </div>
+        <div class="quotes-grid">
+            <div class="quote-card reveal delay-1">
+                <div class="quote-text">"Don't raise your voice, improve your argument."</div>
+                <div class="quote-author">— Desmond Tutu</div>
+            </div>
+            <div class="quote-card reveal delay-2">
+                <div class="quote-text">"He who knows only his own side of the case knows little of that."</div>
+                <div class="quote-author">— John Stuart Mill</div>
+            </div>
+            <div class="quote-card reveal delay-3">
+                <div class="quote-text">"The supreme art of war is to subdue the enemy without fighting."</div>
+                <div class="quote-author">— Sun Tzu</div>
             </div>
         </div>
     </section>
