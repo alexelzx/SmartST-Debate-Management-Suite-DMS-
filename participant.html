@@ -131,7 +131,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0", authDomain: "smartst-debate.firebaseapp.com", projectId: "smartst-debate", storageBucket: "smartst-debate.firebasestorage.app", messagingSenderId: "128238171772", appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9" };
         const app = initializeApp(firebaseConfig);
@@ -261,6 +261,13 @@
                 else { display.innerText = formatTime(rem); }
             }, 100);
         }
+
+        window.addEventListener('beforeunload', () => {
+            if (participantId && joinCode) {
+                deleteDoc(doc(db, "debates", joinCode, "participants", participantId));
+                updateDoc(doc(db, "debates", joinCode), { queue: arrayRemove(participantId) });
+            }
+        });
     </script>
 </body>
 </html>
