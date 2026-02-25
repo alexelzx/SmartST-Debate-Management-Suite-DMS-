@@ -10,7 +10,7 @@
         
         /* Navigation */
         nav { padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 1px;}
         
         /* Core Layout */
         .container { padding: 3rem 2rem; max-width: 1600px; margin: 0 auto; width: 100%; box-sizing: border-box; }
@@ -31,7 +31,7 @@
         input, select { padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 1rem; font-family: 'Inter', sans-serif; }
         
         /* Buttons */
-        button { padding: 0.6rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 0.4rem; justify-content: center; }
+        button { padding: 0.6rem 1rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; }
         button:hover { opacity: 0.85; transform: translateY(-1px); }
         .btn-primary { background: var(--text-color); color: #fff; }
         .btn-success { background: var(--success); color: #fff; }
@@ -42,47 +42,54 @@
 
         /* Specific Modules */
         .master-timer { font-size: 2.5rem; font-family: monospace; font-weight: bold; }
+        .speaker-timer { font-size: 3rem; font-family: monospace; font-weight: 300; color: var(--text-color); }
+        
         .broadcast-panel { background: var(--text-color); color: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; }
         .broadcast-panel input { margin: 0; flex: 1; border: none; background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem; }
         .broadcast-panel input::placeholder { color: rgba(255,255,255,0.5); }
         
-        /* Roster & Logs */
-        .participant-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--border); background: #faf9f7; border-radius: 8px; margin-bottom: 0.5rem; }
-        .queue-badge { font-size: 0.65rem; background: var(--text-color); color: #fff; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 0.5rem; }
+        /* Roster & Grid Action Layout */
+        .participant-card { border: 1px solid var(--border); background: #faf9f7; border-radius: 8px; margin-bottom: 1rem; padding: 1.5rem; }
+        .participant-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px dashed var(--border); padding-bottom: 1rem; }
+        .queue-badge { font-size: 0.65rem; background: var(--text-color); color: #fff; padding: 0.2rem 0.6rem; border-radius: 4px; vertical-align: middle; margin-left: 0.5rem; }
+        
+        /* Professional Action Grid */
+        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+        
         .log-box { background: #1e1e1e; color: #a3a3a3; font-family: monospace; padding: 1.5rem; height: 300px; overflow-y: auto; border-radius: 8px; font-size: 0.8rem; line-height: 1.6; margin-bottom: 2rem; border: 1px solid #000; box-shadow: inset 0 5px 15px rgba(0,0,0,0.5); }
         .log-entry { margin-bottom: 0.5rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo">🏛️ SmartST Executive Host</div>
+        <div class="logo">SmartST Executive Host</div>
         <div style="display: flex; gap: 1rem;">
-            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">📺 Launch TV View</button>
-            <button class="btn-outline" onclick="handleLogout()">🚪 Terminate</button>
+            <button class="btn-outline" id="tvBtn" style="display: none;" onclick="launchTV()">LAUNCH TV VIEW</button>
+            <button class="btn-outline" onclick="handleLogout()">TERMINATE SESSION</button>
         </div>
     </nav>
 
     <div class="container">
         <div id="init-state" class="panel">
-            <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; margin-top: 0;">⚙️ Initialize Framework</h2>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; margin-top: 0;">Initialize Framework</h2>
             <input type="text" id="initTheme" placeholder="Resolution / Theme">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <input type="number" id="totalTimer" placeholder="Total Debate (Min)" value="60">
-                <input type="number" id="baseTimer" placeholder="Default Speaker (Min)" value="5">
+                <input type="number" id="totalTimer" placeholder="Total Debate Duration (Min)" value="60">
+                <input type="number" id="baseTimer" placeholder="Default Speaker Parole (Min)" value="5">
             </div>
-            <button class="btn-primary" style="width: 100%; padding: 1rem;" onclick="generateSession()">🚀 Deploy Secure Environment</button>
+            <button class="btn-primary" style="width: 100%; padding: 1rem;" onclick="generateSession()">DEPLOY SECURE ENVIRONMENT</button>
         </div>
 
         <div id="active-state">
             
             <div class="dashboard-header">
                 <div>
-                    <div style="font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.5rem;">🔑 Access Protocol</div>
+                    <div style="font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.5rem;">Access Protocol</div>
                     <div class="session-code-display" id="displayCode">------</div>
                 </div>
                 <div style="text-align: right;">
-                    <div id="globalStatusDisplay" style="color: var(--danger); font-weight: bold; text-transform: uppercase; font-size: 1.2rem;">🔴 Awaiting Start</div>
-                    <div id="totalConnected" style="font-size: 0.9rem; color: var(--success); font-weight: 600; margin-top: 0.5rem;">🟢 CONNECTED: 0</div>
+                    <div id="globalStatusDisplay" style="color: var(--danger); font-weight: bold; text-transform: uppercase; font-size: 1.2rem;">AWAITING START</div>
+                    <div id="totalConnected" style="font-size: 0.9rem; color: var(--success); font-weight: 600; margin-top: 0.5rem;">CONNECTED: 0</div>
                 </div>
             </div>
 
@@ -91,32 +98,42 @@
                     
                     <div class="panel" style="display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--text-color);">
                         <div>
-                            <h3 style="border: none; margin: 0; padding: 0;">🌍 Master Control</h3>
+                            <h3 style="border: none; margin: 0; padding: 0;">Master Control</h3>
                             <div class="master-timer" id="hostMasterTimer">00:00:00</div>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                             <div style="display: flex; gap: 0.5rem;">
-                                <button class="btn-success" id="btnMasterStart" onclick="toggleMasterStatus('active')">▶️ Start</button>
-                                <button class="btn-warn" id="btnMasterPause" style="display: none;" onclick="toggleMasterStatus('paused')">⏸️ Pause</button>
-                                <button class="btn-danger" id="btnMasterEnd" style="display: none;" onclick="toggleMasterStatus('ended')">⏹️ End</button>
+                                <button class="btn-success" id="btnMasterStart" onclick="toggleMasterStatus('active')">START DEBATE</button>
+                                <button class="btn-warn" id="btnMasterPause" style="display: none;" onclick="toggleMasterStatus('paused')">PAUSE DEBATE</button>
+                                <button class="btn-danger" id="btnMasterEnd" style="display: none;" onclick="toggleMasterStatus('ended')">END DEBATE</button>
                             </div>
-                            <button class="btn-outline" style="width: 100%;" onclick="addExtraTime()">⏳ +5 Min Extra</button>
+                            <button class="btn-outline" style="width: 100%;" onclick="addExtraTime()">+5 MIN EXTRA</button>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="border-left: 5px solid var(--success); background: #fdfdfc;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: bold;">Active Speaker</div>
+                                <div id="hostSpeakerName" style="font-family: 'Playfair Display', serif; font-size: 2rem; margin-top: 0.5rem;">Floor Open</div>
+                            </div>
+                            <div class="speaker-timer" id="hostSpeakerTimer">00:00</div>
                         </div>
                     </div>
 
                     <div class="broadcast-panel">
-                        <div style="font-family: 'Playfair Display', serif; font-size: 1.2rem; min-width: 150px;">📢 Educator Mode</div>
+                        <div style="font-family: 'Playfair Display', serif; font-size: 1.2rem; min-width: 150px;">Educator Mode</div>
                         <input type="text" id="educatorMsg" placeholder="Transmit a global directive...">
-                        <button class="btn-success" onclick="broadcastMessage()">📨 Send</button>
-                        <button class="btn-outline" style="border-color: rgba(255,255,255,0.3); color: #fff;" onclick="clearBroadcast()">🧹 Clear</button>
+                        <button class="btn-success" onclick="broadcastMessage()">SEND</button>
+                        <button class="btn-outline" style="border-color: rgba(255,255,255,0.3); color: #fff;" onclick="clearBroadcast()">CLEAR</button>
                     </div>
 
                     <div class="panel">
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
-                            <h3 style="margin: 0; border: none;">👥 Roster & Discipline</h3>
+                            <h3 style="margin: 0; border: none;">Roster & Discipline</h3>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <input type="number" id="manualTimer" placeholder="Override Min" style="margin: 0; width: 120px;">
-                                <button class="btn-danger" onclick="revokeFloor()">🛑 Halt Speaker</button>
+                                <button class="btn-danger" onclick="revokeFloor()">HALT SPEAKER</button>
                             </div>
                         </div>
                         <div id="participantList"></div>
@@ -125,10 +142,10 @@
 
                 <div class="right-column">
                     <div class="panel" style="background: #faf9f7;">
-                        <h3>📝 Executive Audit Log</h3>
+                        <h3>Executive Audit Log</h3>
                         <div class="log-box" id="fullLog"></div>
                         
-                        <h3 style="color: var(--danger); border-color: rgba(179, 38, 30, 0.2);">🚨 Disciplinary Log</h3>
+                        <h3 style="color: var(--danger); border-color: rgba(179, 38, 30, 0.2);">Disciplinary Log</h3>
                         <div class="log-box" id="warnLog" style="border-left: 4px solid var(--danger); height: 200px;"></div>
                     </div>
                 </div>
@@ -146,10 +163,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        let sessionCode = null, pData = {}, currentQueue = [], masterTimerInterval;
+        let sessionCode = null, pData = {}, currentQueue = [], masterTimerInterval, speakerTimerInterval;
         let globalRemainingMs = 0;
 
-        // Secure Entry Verification
         const urlParams = new URLSearchParams(window.location.search);
         const isModJoin = urlParams.get('role') === 'moderator';
         const sessionParam = urlParams.get('code');
@@ -160,8 +176,6 @@
                 window.location.href = "auth.html"; 
                 return;
             }
-            
-            // Re-attach to existing session if joining as verified Moderator
             if (isModJoin && sessionParam) {
                 sessionCode = sessionParam;
                 document.getElementById('displayCode').innerText = sessionCode;
@@ -199,16 +213,15 @@
                     queue: [], activeSpeakerId: null, activeSpeakerName: "Floor Open", isTimerRunning: false, endTimeMs: null, speakerRemainingMs: null
                 });
                 
-                // UI Transition
                 document.getElementById('init-state').style.display = 'none';
                 document.getElementById('active-state').style.display = 'block';
                 document.getElementById('tvBtn').style.display = 'inline-flex';
                 document.getElementById('displayCode').innerText = sessionCode;
                 
-                appendLog(`🚀 SESSION DEPLOYED: ${code}`);
+                appendLog(`SESSION DEPLOYED: ${code}`);
                 initSync();
             } catch (error) {
-                alert(`Execution Failed: Please ensure Firestore security rules are correctly published. Error: ${error.message}`);
+                alert(`Execution Failed. Error: ${error.message}`);
             }
         };
 
@@ -227,7 +240,7 @@
                     update.endTimeMs = Date.now() + d.speakerRemainingMs;
                     update.speakerRemainingMs = null;
                 }
-                appendLog("▶️ MASTER COMMAND: DEBATE COMMENCED");
+                appendLog("MASTER COMMAND: DEBATE COMMENCED");
             } else if (status === 'paused') {
                 update = { globalStatus: "paused", globalRemainingMs: globalRemainingMs, globalEndTimeMs: null };
                 if (d.isTimerRunning && d.endTimeMs) {
@@ -235,33 +248,33 @@
                     update.speakerRemainingMs = d.endTimeMs - Date.now();
                     update.endTimeMs = null;
                 }
-                appendLog("⏸️ MASTER COMMAND: DEBATE PAUSED");
+                appendLog("MASTER COMMAND: DEBATE PAUSED");
             } else if (status === 'ended') {
                 update = { globalStatus: "ended", globalRemainingMs: 0, globalEndTimeMs: null, isTimerRunning: false, endTimeMs: null, speakerRemainingMs: null };
-                appendLog("⏹️ MASTER COMMAND: DEBATE TERMINATED");
+                appendLog("MASTER COMMAND: DEBATE TERMINATED");
             }
             await updateDoc(ref, update);
         };
 
         window.addExtraTime = async () => {
             const ref = doc(db, "debates", sessionCode);
-            globalRemainingMs += 300000; // 5 mins
+            globalRemainingMs += 300000; 
             const updateObj = { isExtraTime: true, globalRemainingMs: globalRemainingMs };
             if (document.getElementById('globalStatusDisplay').innerText.includes("LIVE") || document.getElementById('globalStatusDisplay').innerText.includes("EXTRA")) {
                 updateObj.globalEndTimeMs = Date.now() + globalRemainingMs;
             }
             await updateDoc(ref, updateObj);
-            appendLog("⏳ MASTER COMMAND: +5 MIN EXTRA TIME AUTHORIZED");
+            appendLog("MASTER COMMAND: +5 MIN EXTRA TIME AUTHORIZED");
         };
 
         window.broadcastMessage = async () => {
             const msg = document.getElementById('educatorMsg').value.trim();
-            if(msg) { await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: msg }); appendLog(`📢 BROADCAST: ${msg}`); }
+            if(msg) { await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: msg }); appendLog(`BROADCAST: ${msg}`); }
         };
 
         window.clearBroadcast = async () => {
             document.getElementById('educatorMsg').value = '';
-            await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: "" }); appendLog(`🧹 BROADCAST CLEARED`);
+            await updateDoc(doc(db, "debates", sessionCode), { educatorMessage: "" }); appendLog(`BROADCAST CLEARED`);
         };
 
         function initSync() {
@@ -272,26 +285,26 @@
                     currentQueue = d.queue || [];
                     
                     currentQueue.forEach(id => {
-                        if(!oldQueue.includes(id) && pData[id]) appendLog(`🎤 PAROLE REQUESTED: ${pData[id].name}`);
+                        if(!oldQueue.includes(id) && pData[id]) appendLog(`PAROLE REQUESTED: ${pData[id].name}`);
                     });
                     oldQueue = currentQueue;
                     
                     const statusDisp = document.getElementById('globalStatusDisplay');
                     if(d.globalStatus === 'active') {
-                        statusDisp.innerText = d.isExtraTime ? "🟢 Extra Time" : "🟢 Debate Live";
+                        statusDisp.innerText = d.isExtraTime ? "EXTRA TIME" : "DEBATE LIVE";
                         statusDisp.style.color = "var(--success)";
                         document.getElementById('btnMasterStart').style.display = 'none';
                         document.getElementById('btnMasterPause').style.display = 'inline-flex';
                         document.getElementById('btnMasterEnd').style.display = 'inline-flex';
                     } else if (d.globalStatus === 'paused') {
-                        statusDisp.innerText = "⏸️ Debate Paused";
+                        statusDisp.innerText = "DEBATE PAUSED";
                         statusDisp.style.color = "var(--warn)";
                         document.getElementById('btnMasterStart').style.display = 'inline-flex';
                         document.getElementById('btnMasterPause').style.display = 'none';
-                        document.getElementById('btnMasterStart').innerHTML = "▶️ Resume";
+                        document.getElementById('btnMasterStart').innerHTML = "RESUME";
                         globalRemainingMs = d.globalRemainingMs;
                     } else if (d.globalStatus === 'ended') {
-                        statusDisp.innerText = "⏹️ Debate Concluded";
+                        statusDisp.innerText = "DEBATE CONCLUDED";
                         statusDisp.style.color = "var(--danger)";
                         document.getElementById('btnMasterStart').style.display = 'none';
                         document.getElementById('btnMasterPause').style.display = 'none';
@@ -299,7 +312,11 @@
                     } else {
                         globalRemainingMs = d.globalRemainingMs;
                     }
+                    
+                    document.getElementById('hostSpeakerName').innerText = d.activeSpeakerName || "Floor Open";
+
                     manageMasterTimer(d.globalEndTimeMs, d.globalStatus === 'active', d.globalRemainingMs);
+                    manageSpeakerTimer(d.endTimeMs, d.isTimerRunning, d.speakerRemainingMs);
                     renderRoster(); 
                 }
             });
@@ -308,16 +325,16 @@
                 snap.docChanges().forEach((change) => {
                     const data = change.doc.data();
                     if (change.type === "added" && !pData[change.doc.id]) {
-                        appendLog(`🔗 CONNECTION: ${data.name} joined the forum.`);
+                        appendLog(`CONNECTION: ${data.name} joined the forum.`);
                     }
                     if (change.type === "removed") {
-                        if(!data.kicked) appendLog(`🔌 DISCONNECTION: ${data.name} left the forum.`);
+                        if(!data.kicked) appendLog(`DISCONNECTION: ${data.name} left the forum.`);
                     }
                 });
                 pData = {}; snap.forEach(d => pData[d.id] = d.data()); 
                 
                 const activeCount = Object.values(pData).filter(p => !p.kicked).length;
-                document.getElementById('totalConnected').innerText = `🟢 CONNECTED: ${activeCount}`;
+                document.getElementById('totalConnected').innerText = `CONNECTED: ${activeCount}`;
                 
                 renderRoster();
             });
@@ -337,10 +354,36 @@
             masterTimerInterval = setInterval(() => {
                 globalRemainingMs = endMs - Date.now();
                 display.innerText = formatTime(globalRemainingMs);
-                if (globalRemainingMs <= 0 && document.getElementById('globalStatusDisplay').innerText !== "⏹️ Debate Concluded") {
+                if (globalRemainingMs <= 0 && document.getElementById('globalStatusDisplay').innerText !== "DEBATE CONCLUDED") {
                     toggleMasterStatus('ended');
                 }
             }, 500);
+        }
+
+        function manageSpeakerTimer(endTime, isRunning, remainingMs) {
+            clearInterval(speakerTimerInterval);
+            const display = document.getElementById('hostSpeakerTimer');
+            const formatTime = (ms) => {
+                if (ms <= 0) return "00:00";
+                const m = Math.floor(ms / 60000);
+                const s = Math.floor((ms % 60000) / 1000);
+                return `${m}:${s.toString().padStart(2, '0')}`;
+            };
+
+            if (!isRunning) {
+                display.innerText = (remainingMs && remainingMs > 0) ? formatTime(remainingMs) : "00:00";
+                return;
+            }
+
+            speakerTimerInterval = setInterval(() => {
+                const rem = endTime - Date.now();
+                if (rem <= 0) { 
+                    clearInterval(speakerTimerInterval); 
+                    display.innerText = "00:00"; 
+                } else {
+                    display.innerText = formatTime(rem);
+                }
+            }, 100);
         }
 
         function renderRoster() {
@@ -350,45 +393,51 @@
         }
 
         function createRow(pid, data, qPos) {
-            const row = document.createElement('div'); row.className = 'participant-row';
+            const row = document.createElement('div'); row.className = 'participant-card';
             let badge = qPos ? `<span class="queue-badge">Q#${qPos}</span>` : '';
+            
             row.innerHTML = `
-                <div style="flex:1;">
-                    <strong>${data.name}${badge}</strong> 
-                    <span style="color:var(--success); font-weight:bold; margin-left:0.5rem;">(${data.points || 0} PT)</span> 
-                    <span style="color:var(--danger); font-weight:bold; margin-left:0.5rem;">[${data.strikes || 0} STRIKES]</span><br>
-                    <small>${data.side} | ${data.team || '--'}</small>
+                <div class="participant-header">
+                    <div>
+                        <strong style="font-size: 1.1rem;">${data.name}${badge}</strong><br>
+                        <small style="color: #666; text-transform: uppercase;">${data.side} | ${data.team || '--'}</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="color:var(--success); font-weight:bold;">${data.points || 0} PT</span><br>
+                        <span style="color:var(--danger); font-weight:bold; font-size: 0.8rem;">${data.strikes || 0} STRIKES</span>
+                    </div>
                 </div>
-                <div style="display:flex; flex-wrap: wrap; gap:0.4rem; justify-content: flex-end;">
-                    <button class="btn-grade" onclick="adjustPoint('${pid}', 1)">➕1</button>
-                    <button class="btn-outline" style="background:#e5e7eb;" onclick="adjustPoint('${pid}', -1)">➖1</button>
-                    <button class="btn-outline" onclick="directMessage('${pid}')">💬 Msg</button>
-                    <button class="btn-success" onclick="grantParole('${pid}')">🎤 Parole</button>
-                    <button class="btn-warn" onclick="issueWarn('${pid}')">⚠️ Warn</button>
-                    <button class="btn-danger" onclick="issueStrike('${pid}')">❌ Strike</button>
-                    <button class="btn-outline" style="border-color:var(--danger); color:var(--danger);" onclick="kickUser('${pid}')">👢 Kick</button>
+                <div class="action-grid">
+                    <button class="btn-grade" onclick="adjustPoint('${pid}', 1)">+1 PT</button>
+                    <button class="btn-outline" style="background:#e5e7eb;" onclick="adjustPoint('${pid}', -1)">-1 PT</button>
+                    <button class="btn-outline" onclick="directMessage('${pid}')">MSG</button>
+                    <button class="btn-success" onclick="grantParole('${pid}')">PAROLE</button>
+                    <button class="btn-warn" onclick="issueWarn('${pid}')">WARN</button>
+                    <button class="btn-outline" onclick="clearWarn('${pid}')">CLR WARN</button>
+                    <button class="btn-danger" onclick="issueStrike('${pid}')">STRIKE</button>
+                    <button class="btn-outline" style="border-color:var(--danger); color:var(--danger);" onclick="kickUser('${pid}')">KICK</button>
                 </div>`;
             return row;
         }
 
         window.adjustPoint = async (pid, val) => { 
             await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { points: (pData[pid].points || 0) + val }); 
-            appendLog(`🏆 ACCOLADE: ${val > 0 ? '+1' : '-1'} Point to ${pData[pid].name}`); 
+            appendLog(`ACCOLADE: ${val > 0 ? '+1' : '-1'} Point to ${pData[pid].name}`); 
         };
         
         window.grantParole = async (pid) => { 
             const mins = parseInt(document.getElementById('manualTimer').value) || parseInt(document.getElementById('baseTimer').value) || 5; 
             await updateDoc(doc(db, "debates", sessionCode), { activeSpeakerId: pid, activeSpeakerName: pData[pid].name, activeTeam: pData[pid].team, activeSide: pData[pid].side, endTimeMs: Date.now() + (mins * 60000), isTimerRunning: true, queue: arrayRemove(pid) }); 
-            appendLog(`🎤 PAROLE GRANTED: ${pData[pid].name}`); 
+            appendLog(`PAROLE GRANTED: ${pData[pid].name}`); 
         };
         
-        window.revokeFloor = async () => { await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open" }); appendLog("🛑 FLOOR REVOKED"); };
+        window.revokeFloor = async () => { await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open" }); appendLog("FLOOR REVOKED"); };
         
         window.directMessage = async (pid) => {
             const m = prompt(`Direct private message to ${pData[pid].name}:`);
             if(m) {
                 await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { directMessage: m });
-                appendLog(`💬 DIRECT MSG: Sent to ${pData[pid].name}`);
+                appendLog(`DIRECT MSG: Sent to ${pData[pid].name}`);
             }
         };
 
@@ -396,9 +445,14 @@
             const m = prompt("Warning Directive:"); 
             if(m) { 
                 await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: m }); 
-                appendLog(`⚠️ WARNING ISSUED: ${pData[pid].name}`);
-                appendWarnLog(`⚠️ WARN -> ${pData[pid].name}: ${m}`);
+                appendLog(`WARNING ISSUED: ${pData[pid].name}`);
+                appendWarnLog(`WARN -> ${pData[pid].name}: ${m}`);
             } 
+        };
+
+        window.clearWarn = async (pid) => {
+            await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { warning: "" });
+            appendLog(`WARNING CLEARED: ${pData[pid].name}`);
         };
         
         window.issueStrike = async (pid) => {
@@ -406,8 +460,8 @@
             if(m) {
                 const currentStrikes = (pData[pid].strikes || 0) + 1;
                 await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { strikes: currentStrikes, strikeMessage: m });
-                appendLog(`❌ STRIKE ISSUED: ${pData[pid].name} (Count: ${currentStrikes})`);
-                appendWarnLog(`❌ STRIKE [${currentStrikes}/3] -> ${pData[pid].name}: ${m}`);
+                appendLog(`STRIKE ISSUED: ${pData[pid].name} (Count: ${currentStrikes})`);
+                appendWarnLog(`STRIKE [${currentStrikes}/3] -> ${pData[pid].name}: ${m}`);
                 if (currentStrikes >= 3) kickUser(pid);
             }
         };
@@ -416,8 +470,8 @@
             if(confirm(`Are you certain you wish to permanently expel ${pData[pid].name}?`)) {
                 await updateDoc(doc(db, "debates", sessionCode, "participants", pid), { kicked: true });
                 await updateDoc(doc(db, "debates", sessionCode), { queue: arrayRemove(pid) });
-                appendLog(`👢 EXPULSION: ${pData[pid].name} has been kicked.`);
-                appendWarnLog(`👢 KICKED -> ${pData[pid].name}`);
+                appendLog(`EXPULSION: ${pData[pid].name} has been kicked.`);
+                appendWarnLog(`KICKED -> ${pData[pid].name}`);
             }
         };
     </script>
