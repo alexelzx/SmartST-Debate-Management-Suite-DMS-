@@ -45,15 +45,17 @@
         .info-section { max-width: 1200px; margin: 0 auto 4rem auto; padding: 4rem; border-top: 1px solid var(--border-color); }
         .info-section h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 3rem; }
         
-        .architect-card { background: #fff; border: 1px solid var(--border-color); padding: 3rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 2rem; }
+        /* Refined Architect Card */
+        .architect-card { background: #fff; border: 1px solid rgba(28, 28, 28, 0.08); padding: 4rem; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); margin-bottom: 2rem; }
         
-        /* Profile Layout Styles */
-        .architect-profile { display: grid; grid-template-columns: 220px 1fr; gap: 3rem; align-items: start; }
-        .author-image { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); object-fit: cover; aspect-ratio: 1 / 1; }
+        /* New Profile Layout */
+        .architect-profile { display: grid; grid-template-columns: 1fr 180px; gap: 4rem; align-items: center; }
+        .author-image-container { display: flex; justify-content: center; }
+        .author-image { width: 180px; height: 180px; border-radius: 50%; box-shadow: 0 8px 25px rgba(0,0,0,0.1); object-fit: cover; object-position: center 20%; border: 3px solid #fff; }
+        
         .architect-bio p { color: var(--text-muted); font-weight: 300; font-size: 1.05rem; text-align: justify; margin-bottom: 1.5rem; }
         
-        /* EFPRP Endorsement Styles */
-        .endorsement-block { display: flex; align-items: center; gap: 1.5rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+        .endorsement-block { display: flex; align-items: center; gap: 1.5rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
         .endorsement-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; }
         .endorsement-logo { height: 60px; width: auto; object-fit: contain; }
 
@@ -74,9 +76,9 @@
             footer { flex-direction: column; gap: 1.5rem; text-align: center; }
             .footer-links a { margin: 0 1rem; }
             
-            /* Mobile Profile Layout Adjustments */
+            /* Mobile Profile Layout */
             .architect-profile { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 2rem; }
-            .author-image { width: 200px; }
+            .author-image-container { order: -1; margin-bottom: 1rem; }
             .architect-bio p { text-align: center; }
             .endorsement-block { flex-direction: column; text-align: center; justify-content: center; }
         }
@@ -111,12 +113,10 @@
         <h2>About the Architect</h2>
         <div class="architect-card">
             <div class="architect-profile">
-                <img src="author.png" alt="Alexios ELIZALDE XIROKOSTA" class="author-image">
-                
                 <div class="architect-bio">
                     <p>The SmartST Debate Management Suite (DMS) was engineered by <strong>Alexios ELIZALDE XIROKOSTA</strong>, a 20-year-old scholar at the IUT de Toulouse (formerly Université Paul Sabatier III) and the Chief Executive Officer of the European Fire Prevention & Rural Preservation Organization (EFPRP).</p>
                     
-                    <p>Driven by a passion to optimize daily workflows for professionals and academics, Mr. Elizalde's development portfolio focuses on high-utility cloud applications. This includes the successful deployment of the <em>MCalC+ SmartST OS</em> a comprehensive software ecosystem designed for the BUT Infocom 2025-2026 cohort. This system modernized academic logistics by replacing static PDF schedules with a dynamic digital calendar, while fully integrating grade calculations (moyennes), automated absence tracking (suivi d'absence), dynamic roll call (appel), digital homework logs (devoirs), and a robust cloud roadmap.</p>
+                    <p>Driven by a passion to optimize daily workflows for professionals and academics, Mr. Elizalde's development portfolio focuses on high-utility cloud applications. This includes the successful deployment of the <em>MCalC+ SmartST OS</em>—a comprehensive software ecosystem designed for the BUT Infocom 2025-2026 cohort. This system modernized academic logistics by replacing static PDF schedules with a dynamic digital calendar, while fully integrating grade calculations (moyennes), automated absence tracking (suivi d'absence), dynamic roll call (appel), digital homework logs (devoirs), and a robust cloud roadmap.</p>
                     
                     <p>Expanding upon this technical foundation, the SmartST DMS was purpose-built to empower universities and institutions to execute high-scale, synchronized debates. Featuring intuitive, enterprise-grade functionality and stringent administrative controls, the platform ensures absolute clarity and fairness.</p>
 
@@ -124,6 +124,9 @@
                         <div class="endorsement-label">Officially Endorsed By</div>
                         <img src="end.png" alt="EFPRP Official Logo" class="endorsement-logo">
                     </div>
+                </div>
+                <div class="author-image-container">
+                    <img src="author.png" alt="Alexios ELIZALDE XIROKOSTA" class="author-image">
                 </div>
             </div>
         </div>
