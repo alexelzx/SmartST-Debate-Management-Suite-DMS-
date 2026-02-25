@@ -5,7 +5,7 @@
     <title>SmartST DMS - Debator Panel</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@300;400;600&display=swap');
-        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; --accent: #2c3e50; }
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; }
         body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         #educatorBanner { background: var(--text-color); color: #fff; padding: 1rem; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; display: none; }
@@ -26,6 +26,12 @@
         .roster-list { flex: 1; overflow-y: auto; padding: 1rem 2rem; }
         .notes-area { flex: 1; position: relative; display: flex; flex-direction: column; border-top: 1px solid var(--border); }
         textarea { flex: 1; border: none; padding: 1.5rem; resize: none; outline: none; line-height: 1.6; }
+        
+        /* Dropdown properly positioned relative to the notes area */
+        #mention-dropdown { position: absolute; bottom: 100%; left: 0; background: #fff; border: 1px solid var(--border); border-radius: 8px 8px 0 0; display: none; z-index: 100; max-height: 200px; overflow-y: auto; width: 100%; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        .mention-item { padding: 10px 20px; cursor: pointer; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+        .mention-item:hover { background: var(--bg-color); }
+        
         #warning-banner { background: var(--danger); color: white; padding: 1rem; text-align: center; font-weight: 600; display: none; }
         #setup-screen { position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--bg-color); z-index: 200; display: flex; align-items: center; justify-content: center; }
         .btn-request { background: var(--text-color); color: #fff; width: 100%; padding: 1rem; border: none; border-radius: 8px; cursor: pointer; }
@@ -72,10 +78,11 @@
             </div>
         </div>
         <div class="side-panel">
-            <div style="padding:1rem 2rem; font-weight:600; border-bottom:1px solid var(--border);">Roster</div>
+            <div style="padding:1rem 2rem; font-weight:600; border-bottom:1px solid var(--border);">Roster & Accolades</div>
             <div class="roster-list" id="rosterList"></div>
             <div class="notes-area">
-                <textarea id="debatorNotes" placeholder="Draft arguments... Use @ to mention."></textarea>
+                <div id="mention-dropdown"></div>
+                <textarea id="debatorNotes" oninput="handleNoteInput(event)" placeholder="Draft arguments... Use @ to tag a debator."></textarea>
             </div>
         </div>
     </div>
@@ -90,6 +97,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const joinCode = urlParams.get('code');
         let participantId = null, inQueue = false, timerInterval, wasSpeaking = false;
+        let rosterNames = [];
 
         window.joinForum = async () => {
             const n = document.getElementById('partName').value.trim();
@@ -97,7 +105,7 @@
             const s = document.getElementById('partSide').value;
             if(!n) return;
             participantId = "PART_" + Date.now();
-            await setDoc(doc(db, "debates", joinCode, "participants", participantId), { name: n, side: s, team: t, warning: "", notes: "" });
+            await setDoc(doc(db, "debates", joinCode, "participants", participantId), { name: n, side: s, team: t, points: 0, warning: "", notes: "" });
             document.getElementById('setup-screen').style.display = 'none';
             const badge = document.getElementById('idBadge'); badge.innerText = `${n} | ${s} (${t})`; badge.style.display = 'block';
             initListeners();
@@ -112,14 +120,10 @@
                 document.getElementById('speakerDisplay').innerText = data.activeSpeakerName;
                 document.getElementById('teamDisplay').innerText = `${data.activeSide || '--'} | ${data.activeTeam || '--'}`;
                 
-                // Educator Banner Logic
                 const edBanner = document.getElementById('educatorBanner');
                 if (data.educatorMessage && data.educatorMessage.trim() !== "") {
-                    edBanner.querySelector('span').innerText = data.educatorMessage;
-                    edBanner.style.display = 'block';
-                } else {
-                    edBanner.style.display = 'none';
-                }
+                    edBanner.querySelector('span').innerText = data.educatorMessage; edBanner.style.display = 'block';
+                } else { edBanner.style.display = 'none'; }
 
                 const meSpeaking = data.activeSpeakerId === participantId;
                 const card = document.getElementById('speakerCard');
@@ -128,15 +132,21 @@
                     document.getElementById('paroleSound').play();
                     card.classList.add('is-speaking'); wasSpeaking = true;
                 } else if (!meSpeaking) {
-                    card.classList.remove('is-speaking');
-                    document.getElementById('turn-overlay').style.display = 'none'; wasSpeaking = false;
+                    card.classList.remove('is-speaking'); document.getElementById('turn-overlay').style.display = 'none'; wasSpeaking = false;
                 }
                 manageTimer(data.endTimeMs, data.isTimerRunning); updateQueueUI(data.queue || []);
             });
 
             onSnapshot(collection(db, "debates", joinCode, "participants"), (snap) => {
-                const list = document.getElementById('rosterList'); list.innerHTML = '';
-                snap.forEach(d => { list.innerHTML += `<div style="padding:0.5rem 0; border-bottom:1px dashed var(--border); font-size:0.85rem;">${d.data().name}</div>`; });
+                const list = document.getElementById('rosterList'); list.innerHTML = ''; rosterNames = [];
+                snap.forEach(d => { 
+                    const data = d.data();
+                    rosterNames.push(data.name);
+                    list.innerHTML += `<div style="padding:0.8rem 0; border-bottom:1px dashed var(--border); font-size:0.85rem; display:flex; justify-content:space-between; align-items:center;">
+                        <span>${data.name}</span>
+                        <span style="color:var(--success); font-weight:bold;">${data.points || 0} PT</span>
+                    </div>`; 
+                });
             });
 
             onSnapshot(doc(db, "debates", joinCode, "participants", participantId), (s) => {
@@ -156,6 +166,45 @@
             const btn = document.getElementById('queueBtn'); btn.innerText = inQueue ? "Revoke Request" : "Request Parole";
             document.getElementById('queueStatus').innerText = inQueue ? `Position: ${idx + 1}` : "Not in queue.";
         }
+
+        // Advanced Dynamic @Mention Engine
+        window.handleNoteInput = (e) => {
+            const val = e.target.value;
+            const dropdown = document.getElementById('mention-dropdown');
+            const words = val.split(/[\s\n]+/);
+            const currentWord = words[words.length - 1];
+
+            if (currentWord.startsWith('@')) {
+                const searchQuery = currentWord.slice(1).toLowerCase();
+                const matches = rosterNames.filter(name => name.toLowerCase().includes(searchQuery));
+                
+                if (matches.length > 0) {
+                    dropdown.style.display = 'block';
+                    dropdown.innerHTML = matches.map(n => `<div class="mention-item" onclick="insertMention('${n}')">@${n}</div>`).join('');
+                } else {
+                    dropdown.style.display = 'none';
+                }
+            } else {
+                dropdown.style.display = 'none';
+            }
+        };
+
+        window.insertMention = (name) => {
+            const textarea = document.getElementById('debatorNotes');
+            const words = textarea.value.split(/(\s+)/); // Preserve whitespace
+            
+            // Remove the partial @ query (last word) and replace it
+            for (let i = words.length - 1; i >= 0; i--) {
+                if (words[i].trim().startsWith('@')) {
+                    words[i] = `@${name} `;
+                    break;
+                }
+            }
+            
+            textarea.value = words.join('');
+            document.getElementById('mention-dropdown').style.display = 'none';
+            textarea.focus();
+        };
 
         function manageTimer(e, r) {
             clearInterval(timerInterval); if(!r || !e) { document.getElementById('timeDisplay').innerText = "00:00"; return; }
