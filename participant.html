@@ -5,7 +5,10 @@
     <title>SmartST DMS - Debator Panel</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600&family=Inter:wght@300;400;600&display=swap');
-        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; --accent: #2c3e50; }
+        
+        /* The missing --warn variable has been securely integrated */
+        :root { --bg-color: #F4F2ED; --text-color: #1C1C1C; --border: rgba(0,0,0,0.1); --danger: #b3261e; --success: #16a34a; --accent: #2c3e50; --warn: #ea580c; }
+        
         body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
         #app-container { display: flex; flex-direction: column; height: 100%; transition: all 1s ease; }
@@ -32,6 +35,10 @@
 
         nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; z-index: 10;}
         .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
+        
+        /* Personal Standing Badge */
+        .stats-badge { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #fff; padding: 0.5rem 1rem; border-radius: 50px; background: var(--text-color); transition: background 0.3s; font-weight: 600; }
+
         .workspace { display: flex; flex: 1; overflow: hidden; }
         .main-stage { flex: 2; padding: 2rem; display: flex; flex-direction: column; align-items: center; border-right: 1px solid var(--border); overflow-y: auto; }
         .side-panel { flex: 1; background: #fff; display: flex; flex-direction: column; }
@@ -41,8 +48,12 @@
         @keyframes breatheGreen { 0%, 100% { box-shadow: 0 0 0px rgba(0,0,0,0); border-color: var(--border); } 50% { box-shadow: inset 0 0 30px rgba(22,163,74,0.1), 0 0 20px rgba(22,163,74,0.3); border-color: var(--success); } }
         .btn-request { background: var(--text-color); color: #fff; width: 100%; padding: 1rem; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; font-weight: bold;}
         .close-overlay { margin-top: 2rem; padding: 1rem 2.5rem; border: 2px solid white; background: transparent; color: white; font-weight: 600; border-radius: 50px; cursor: pointer; text-transform: uppercase; }
+        
         #setup-screen { position: fixed; top:0; left:0; width: 100%; height: 100%; background: var(--bg-color); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        #warning-banner { background: var(--warn); color: white; padding: 1rem; text-align: center; font-weight: 600; display: none; }
+        
+        /* High-Visibility Warning Banner */
+        #warning-banner { background: var(--warn); color: white; padding: 1rem; text-align: center; font-weight: 600; display: none; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(234, 88, 12, 0.2); }
+        
         #educatorBanner { background: var(--text-color); color: #fff; padding: 1rem; text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; display: none; }
         .extra-badge { display: none; background: var(--success); color: #fff; font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 4px; margin-left: 1rem; vertical-align: middle; }
     </style>
@@ -93,10 +104,16 @@
     <div id="app-container" class="state-waiting">
         <div id="educatorBanner">📢 EDUCATOR DIRECTIVE: <span></span></div>
         <nav>
-            <div style="display: flex; align-items: center; gap: 1rem;"><div class="logo">SmartST.</div><div id="idBadge" style="font-size: 0.75rem; text-transform: uppercase; color: #666; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 50px; background: #faf9f7; display: none;"></div></div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo">SmartST.</div>
+                <div id="idBadge" style="font-size: 0.75rem; text-transform: uppercase; color: #666; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 50px; background: #faf9f7; display: none;"></div>
+                <div id="myStatsBadge" class="stats-badge" style="display: none;">0 PT | 0 STRIKES</div>
+            </div>
             <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Session: <span id="codeDisplay">---</span> <span id="extraTimeBadge" class="extra-badge">EXTRA TIME</span></div>
         </nav>
+        
         <div id="warning-banner">⚠️ WARNING: <span id="warning-text"></span></div>
+        
         <div class="workspace">
             <div class="main-stage">
                 <div id="themeDisplay" style="text-transform:uppercase; letter-spacing:2px; color:#888; margin-bottom:2rem;">Pending</div>
@@ -196,11 +213,24 @@
                 });
             });
 
+            // Participant Local Overlays & Badges
             onSnapshot(doc(db, "debates", joinCode, "participants", participantId), (s) => {
                 const d = s.data(); 
                 if(!d) return;
                 
                 if (d.kicked) { alert("You were kicked from the session. Do not rejoin."); window.location.href = "main.html"; return; }
+
+                // Personal Standing Badge Logic
+                const statsBadge = document.getElementById('myStatsBadge');
+                statsBadge.style.display = 'block';
+                statsBadge.innerText = `${d.points || 0} PT | ${d.strikes || 0} STRIKES`;
+                if ((d.strikes || 0) > 0) {
+                    statsBadge.style.background = 'var(--danger)';
+                } else if ((d.points || 0) > 0) {
+                    statsBadge.style.background = 'var(--success)';
+                } else {
+                    statsBadge.style.background = 'var(--text-color)';
+                }
 
                 if (d.strikeMessage) {
                     document.getElementById('strike-reason').innerText = `Directive: ${d.strikeMessage}`;
@@ -213,6 +243,7 @@
                     document.getElementById('direct-msg-overlay').style.display = 'flex';
                 } else { document.getElementById('direct-msg-overlay').style.display = 'none'; }
 
+                // High-Visibility Warning Banner Logic
                 const banner = document.getElementById('warning-banner');
                 if(d.warning) { document.getElementById('warning-text').innerText = d.warning; banner.style.display = 'block'; } else banner.style.display = 'none';
             });
