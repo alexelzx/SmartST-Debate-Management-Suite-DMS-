@@ -23,214 +23,53 @@
             line-height: 1.6;
         }
 
-        /* Navigation */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 2rem 4rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .logo { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 1.5rem; 
-            font-weight: 600; 
-            letter-spacing: -0.5px; 
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2.5rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text-color);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: opacity 0.3s;
-        }
-
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 2rem 4rem; border-bottom: 1px solid var(--border-color); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.5px; }
+        .nav-links { display: flex; gap: 2.5rem; }
+        .nav-links a { text-decoration: none; color: var(--text-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.3s; }
         .nav-links a:hover { opacity: 0.6; }
 
-        /* Hero Section */
-        .hero {
-            padding: 6rem 4rem 4rem 4rem;
-            text-align: center;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            font-family: 'Playfair Display', serif; 
-            font-size: 5rem; 
-            font-weight: 400;
-            line-height: 1.1; 
-            margin: 0 0 1.5rem 0; 
-            letter-spacing: -1.5px;
-        }
-
+        .hero { padding: 6rem 4rem 4rem 4rem; text-align: center; max-width: 1000px; margin: 0 auto; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 5rem; font-weight: 400; line-height: 1.1; margin: 0 0 1.5rem 0; letter-spacing: -1.5px; }
         h1 i { color: #555; }
+        .subtitle { font-size: 1.1rem; color: var(--text-muted); font-weight: 300; margin: 0 auto 3rem auto; max-width: 700px; }
 
-        .subtitle { 
-            font-size: 1.1rem; 
-            color: var(--text-muted); 
-            font-weight: 300; 
-            margin: 0 auto 3rem auto;
-            max-width: 700px;
-        }
+        .image-container { width: 100%; max-width: 1200px; margin: 0 auto 4rem auto; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+        .image-container img { width: 100%; height: 500px; object-fit: cover; object-position: center 60%; display: block; transition: transform 0.7s ease; }
+        .image-container:hover img { transform: scale(1.03); }
 
-        /* Tree Image */
-        .image-container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto 4rem auto;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-        }
+        .access-container { text-align: center; margin-bottom: 6rem; }
+        .btn-launch { background: var(--text-color); color: var(--bg-color); padding: 1.2rem 3rem; border: none; border-radius: 50px; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: transform 0.2s, opacity 0.3s; }
+        .btn-launch:hover { opacity: 0.9; transform: translateY(-2px); }
 
-        .image-container img {
-            width: 100%;
-            height: 500px;
-            object-fit: cover;
-            object-position: center 60%;
-            display: block;
-            transition: transform 0.7s ease;
-        }
-
-        .image-container:hover img {
-            transform: scale(1.03);
-        }
-
-        /* Unified Access Action */
-        .access-container {
-            text-align: center;
-            margin-bottom: 6rem;
-        }
-
-        .btn-launch {
-            background: var(--text-color);
-            color: var(--bg-color);
-            padding: 1.2rem 3rem;
-            border: none;
-            border-radius: 50px;
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: transform 0.2s, opacity 0.3s;
-        }
-
-        .btn-launch:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        /* Two-Column Info Section */
-        .info-grid {
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 4rem;
-            max-width: 1200px; 
-            margin: 0 auto 4rem auto; 
-            padding: 4rem;
-            border-top: 1px solid var(--border-color);
-        }
+        .info-section { max-width: 1200px; margin: 0 auto 4rem auto; padding: 4rem; border-top: 1px solid var(--border-color); }
+        .info-section h2 { font-family: 'Playfair Display', serif; font-size: 2.5rem; text-align: center; margin-bottom: 3rem; }
         
-        .info-card h2 { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 2rem; 
-            margin-top: 0; 
-        }
+        .architect-card { background: #fff; border: 1px solid var(--border-color); padding: 3rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); margin-bottom: 2rem; }
+        .architect-card p { color: var(--text-muted); font-weight: 300; font-size: 1.05rem; text-align: justify; margin-bottom: 1.5rem; }
         
-        .info-card p { 
-            color: var(--text-muted); 
-            font-weight: 300; 
-            font-size: 1.05rem; 
-        }
+        /* EFPRP Endorsement Styles */
+        .endorsement-block { display: flex; align-items: center; gap: 1.5rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color); }
+        .endorsement-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); font-weight: 600; }
+        .endorsement-logo { height: 60px; width: auto; object-fit: contain; }
 
-        /* Tips Section */
-        .tips-section { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            padding: 4rem; 
-            border-top: 1px solid var(--border-color); 
-        }
+        .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .tip-card { background: transparent; border: 1px solid var(--border-color); padding: 2.5rem; border-radius: 12px; transition: transform 0.3s, background 0.3s; }
+        .tip-card:hover { transform: translateY(-5px); background: #ffffff; }
+        .tip-quote { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-style: italic; margin-bottom: 1.5rem; }
+        .tip-author { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
-        .tips-section h2 { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 2.5rem; 
-            text-align: center; 
-            margin-bottom: 3rem; 
-        }
-
-        .tips-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 2rem; 
-        }
-
-        .tip-card {
-            background: transparent; 
-            border: 1px solid var(--border-color);
-            padding: 2.5rem; 
-            border-radius: 12px; 
-            transition: transform 0.3s, background 0.3s;
-        }
-
-        .tip-card:hover { 
-            transform: translateY(-5px); 
-            background: #ffffff; 
-        }
-
-        .tip-quote { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 1.2rem; 
-            font-style: italic; 
-            margin-bottom: 1.5rem; 
-        }
-
-        .tip-author { 
-            font-size: 0.85rem; 
-            font-weight: 600; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-        }
-
-        /* Footer */
-        footer {
-            border-top: 1px solid var(--border-color); 
-            padding: 3rem 4rem;
-            display: flex; 
-            justify-content: space-between; 
-            font-size: 0.85rem;
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-        }
-
-        .footer-links a { 
-            color: inherit; 
-            text-decoration: none; 
-            margin-left: 2rem; 
-            transition: color 0.2s; 
-        }
-
-        .footer-links a:hover { 
-            color: var(--text-color); 
-        }
+        footer { border-top: 1px solid var(--border-color); padding: 3rem 4rem; display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .footer-links a { color: inherit; text-decoration: none; margin-left: 2rem; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--text-color); }
 
         @media (max-width: 768px) {
             h1 { font-size: 3.5rem; }
-            .info-grid { grid-template-columns: 1fr; gap: 2rem; padding: 2rem; }
+            .info-section { padding: 2rem; }
             .nav-links { display: none; }
             footer { flex-direction: column; gap: 1.5rem; text-align: center; }
             .footer-links a { margin: 0 1rem; }
+            .endorsement-block { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -239,7 +78,7 @@
     <nav>
         <div class="logo">SmartST DMS.</div>
         <div class="nav-links">
-            <a href="#about">About</a>
+            <a href="#about">Credits</a>
             <a href="#insights">Insights</a>
             <a href="rdmp.html">Roadmap</a>
             <a href="index.html">Access Portal</a>
@@ -259,19 +98,23 @@
         <button class="btn-launch" onclick="window.location.href='index.html'">Launch SmartST Debate Login</button>
     </div>
 
-    <section id="about" class="info-grid">
-        <div class="info-card">
-            <h2>System Architecture</h2>
-            <p>The SmartST Debate Management Suite (DMS) eliminates the administrative friction of structured argumentation. By synchronizing cross-device chronometry through cloud infrastructure, it ensures absolute fairness, precise speaking intervals, and undeniable clarity for all participants.</p>
-        </div>
-        
-        <div class="info-card">
-            <h2>Development Pedigree</h2>
-            <p>Architected by an Information-Communication scholar based in Toulouse, SmartST DMS represents the synthesis of digital latency control and advanced rhetorical theory. It bridges the gap between technical infrastructure and human intellectual exchange.</p>
+    <section id="about" class="info-section">
+        <h2>About the Architect</h2>
+        <div class="architect-card">
+            <p>The SmartST Debate Management Suite (DMS) was engineered by <strong>Alexios ELIZALDE XIROKOSTA</strong>, a 20-year-old scholar at the IUT de Toulouse (formerly Université Paul Sabatier III) and the Chief Executive Officer of the European Fire Prevention & Rural Preservation Organization (EFPRP).</p>
+            
+            <p>Driven by a passion to optimize daily workflows for professionals and academics, Mr. Elizalde's development portfolio focuses on high-utility cloud applications. This includes the successful deployment of the <em>MCalC+ SmartST OS</em>—a comprehensive software ecosystem designed for the BUT Infocom 2025-2026 cohort. This system modernized academic logistics by replacing static PDF schedules with a dynamic digital calendar, while fully integrating grade calculations (moyennes), automated absence tracking (suivi d'absence), dynamic roll call (appel), digital homework logs (devoirs), and a robust cloud roadmap.</p>
+            
+            <p>Expanding upon this technical foundation, the SmartST DMS was purpose-built to empower universities and institutions to execute high-scale, synchronized debates. Featuring intuitive, enterprise-grade functionality and stringent administrative controls, the platform ensures absolute clarity and fairness.</p>
+
+            <div class="endorsement-block">
+                <div class="endorsement-label">Officially Endorsed By</div>
+                <img src="end.png" alt="EFPRP Official Logo" class="endorsement-logo">
+            </div>
         </div>
     </section>
 
-    <section id="insights" class="tips-section">
+    <section id="insights" class="info-section" style="border-top: none; padding-top: 0;">
         <h2>Strategic Insights</h2>
         <div class="tips-grid">
             <div class="tip-card">
@@ -279,7 +122,7 @@
                 <div class="tip-author">— Desmond Tutu</div>
             </div>
             <div class="tip-card">
-                <div class="tip-quote">"He who knows only his own side of the case knows little of that. His reasons may be good, and no one may have been able to refute them."</div>
+                <div class="tip-quote">"He who knows only his own side of the case knows little of that."</div>
                 <div class="tip-author">— John Stuart Mill</div>
             </div>
             <div class="tip-card">
@@ -298,6 +141,4 @@
     </footer>
 
 </body>
-
 </html>
-
