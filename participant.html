@@ -118,4 +118,94 @@
         window.joinForum = async () => {
             const n = document.getElementById('partName').value.trim(); const t = document.getElementById('partTeam').value.trim() || "--"; const s = document.getElementById('partSide').value;
             if(!n) return; participantId = "PART_" + Date.now();
-            await setDoc(doc(db, "debates", joinCode, "participants", participantId),
+            await setDoc(doc(db, "debates", joinCode, "participants", participantId), { name: n, side: s, team: t, points: 0, strikes: 0, warning: "", strikeMessage: "", kicked: false });
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('idBadge').innerText = `${n} | ${s} (${t})`; document.getElementById('idBadge').style.display = 'block';
+            document.getElementById('codeDisplay').innerText = joinCode;
+            initListeners();
+        };
+
+        window.closeTurnOverlay = () => { document.getElementById('turn-overlay').style.display = 'none'; };
+        
+        window.acknowledgeStrike = async () => {
+            await updateDoc(doc(db, "debates", joinCode, "participants", participantId), { strikeMessage: "" });
+            document.getElementById('strike-overlay').style.display = 'none';
+        };
+
+        function initListeners() {
+            onSnapshot(doc(db, "debates", joinCode), (s) => {
+                const data = s.data(); if(!data) return;
+                document.getElementById('themeDisplay').innerText = data.theme;
+                document.getElementById('speakerDisplay').innerText = data.activeSpeakerName;
+                document.getElementById('teamDisplay').innerText = `${data.activeSide || '--'} | ${data.activeTeam || '--'}`;
+                
+                // Extra Time
+                document.getElementById('extraTimeBadge').style.display = data.isExtraTime ? 'inline-block' : 'none';
+
+                // Master States
+                const appContainer = document.getElementById('app-container');
+                const pauseOverlay = document.getElementById('global-pause-overlay');
+                const endedOverlay = document.getElementById('ended-overlay');
+                
+                pauseOverlay.style.display = data.globalStatus === 'paused' ? 'flex' : 'none';
+                endedOverlay.style.display = data.globalStatus === 'ended' ? 'flex' : 'none';
+
+                if (data.globalStatus === 'active') {
+                    appContainer.classList.remove('state-waiting');
+                    if (prevGlobalStatus === 'waiting') {
+                        document.getElementById('speakerCard').classList.add('neon-activation');
+                        setTimeout(() => { document.getElementById('speakerCard').classList.remove('neon-activation'); }, 6000);
+                    }
+                } else if (data.globalStatus === 'waiting') { appContainer.classList.add('state-waiting'); }
+                prevGlobalStatus = data.globalStatus;
+
+                // Parole
+                const meSpeaking = data.activeSpeakerId === participantId;
+                const card = document.getElementById('speakerCard');
+                if (meSpeaking && !wasSpeaking) { document.getElementById('turn-overlay').style.display = 'flex'; document.getElementById('paroleSound').play(); card.classList.add('is-speaking'); wasSpeaking = true; } 
+                else if (!meSpeaking) { card.classList.remove('is-speaking'); document.getElementById('turn-overlay').style.display = 'none'; wasSpeaking = false; }
+                
+                manageTimer(data.endTimeMs, data.isTimerRunning); updateQueueUI(data.queue || []);
+            });
+
+            onSnapshot(collection(db, "debates", joinCode, "participants"), (snap) => {
+                const list = document.getElementById('rosterList'); list.innerHTML = '';
+                snap.forEach(d => { 
+                    const data = d.data(); 
+                    if(!data.kicked) list.innerHTML += `<div style="padding:0.8rem 0; border-bottom:1px dashed var(--border); font-size:0.85rem; display:flex; justify-content:space-between;"><span>${data.name}</span><span style="color:var(--success); font-weight:bold;">${data.points || 0} PT</span></div>`; 
+                });
+            });
+
+            onSnapshot(doc(db, "debates", joinCode, "participants", participantId), (s) => {
+                const d = s.data(); 
+                if(!d) return;
+                
+                if (d.kicked) { alert("You were kicked from the session. Do not rejoin."); window.location.href = "main.html"; return; }
+
+                if (d.strikeMessage) {
+                    document.getElementById('strike-reason').innerText = `Directive: ${d.strikeMessage}`;
+                    document.getElementById('strike-count').innerText = d.strikes;
+                    document.getElementById('strike-overlay').style.display = 'flex';
+                } else {
+                    document.getElementById('strike-overlay').style.display = 'none';
+                }
+
+                const banner = document.getElementById('warning-banner');
+                if(d.warning) { document.getElementById('warning-text').innerText = d.warning; banner.style.display = 'block'; } else banner.style.display = 'none';
+            });
+        }
+
+        window.toggleQueue = async () => { const ref = doc(db, "debates", joinCode); if(inQueue) await updateDoc(ref, { queue: arrayRemove(participantId) }); else await updateDoc(ref, { queue: arrayUnion(participantId) }); };
+        function updateQueueUI(q) { const idx = q.indexOf(participantId); inQueue = idx !== -1; const btn = document.getElementById('queueBtn'); btn.innerText = inQueue ? "Revoke Request" : "Request Parole"; document.getElementById('queueStatus').innerText = inQueue ? `Position: ${idx + 1}` : "Not in queue."; }
+        
+        function manageTimer(e, r) {
+            clearInterval(timerInterval); if(!r || !e) { document.getElementById('timeDisplay').innerText = "00:00"; return; }
+            timerInterval = setInterval(() => {
+                const rem = e - Date.now();
+                if(rem <= 0) { clearInterval(timerInterval); document.getElementById('timeDisplay').innerText = "00:00"; }
+                else { const m = Math.floor(rem/60000), s = Math.floor((rem%60000)/1000); document.getElementById('timeDisplay').innerText = `${m}:${s.toString().padStart(2,'0')}`; }
+            }, 100);
+        }
+    </script>
+</body>
+</html>
