@@ -10,7 +10,7 @@
         
         /* Navigation */
         nav { padding: 1rem 3rem; border-bottom: 1px solid var(--border); background: #fff; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; text-transform: uppercase; letter-spacing: 1px;}
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
         
         /* Core Layout */
         .container { padding: 3rem 2rem; max-width: 1600px; margin: 0 auto; width: 100%; box-sizing: border-box; }
@@ -49,6 +49,7 @@
         .broadcast-panel input::placeholder { color: rgba(255,255,255,0.5); }
         
         /* Roster & Grid Action Layout */
+        .search-bar { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 1.5rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
         .participant-card { border: 1px solid var(--border); background: #faf9f7; border-radius: 8px; margin-bottom: 1rem; padding: 1.5rem; }
         .participant-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px dashed var(--border); padding-bottom: 1rem; }
         .queue-badge { font-size: 0.65rem; background: var(--text-color); color: #fff; padding: 0.2rem 0.6rem; border-radius: 4px; vertical-align: middle; margin-left: 0.5rem; }
@@ -129,13 +130,16 @@
                     </div>
 
                     <div class="panel">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem;">
                             <h3 style="margin: 0; border: none;">Roster & Discipline</h3>
                             <div style="display: flex; gap: 0.5rem; align-items: center;">
                                 <input type="number" id="manualTimer" placeholder="Override Min" style="margin: 0; width: 120px;">
                                 <button class="btn-danger" onclick="revokeFloor()">HALT SPEAKER</button>
                             </div>
                         </div>
+                        
+                        <input type="text" id="searchRoster" class="search-bar" placeholder="Search participants by name or organization..." oninput="renderRoster()">
+                        
                         <div id="participantList"></div>
                     </div>
                 </div>
@@ -301,6 +305,7 @@
                         statusDisp.style.color = "var(--warn)";
                         document.getElementById('btnMasterStart').style.display = 'inline-flex';
                         document.getElementById('btnMasterPause').style.display = 'none';
+                        document.getElementById('btnMasterEnd').style.display = 'inline-flex';
                         document.getElementById('btnMasterStart').innerHTML = "RESUME";
                         globalRemainingMs = d.globalRemainingMs;
                     } else if (d.globalStatus === 'ended') {
@@ -308,6 +313,7 @@
                         statusDisp.style.color = "var(--danger)";
                         document.getElementById('btnMasterStart').style.display = 'none';
                         document.getElementById('btnMasterPause').style.display = 'none';
+                        document.getElementById('btnMasterEnd').style.display = 'none';
                         globalRemainingMs = 0;
                     } else {
                         globalRemainingMs = d.globalRemainingMs;
@@ -317,7 +323,7 @@
 
                     manageMasterTimer(d.globalEndTimeMs, d.globalStatus === 'active', d.globalRemainingMs);
                     manageSpeakerTimer(d.endTimeMs, d.isTimerRunning, d.speakerRemainingMs);
-                    renderRoster(); 
+                    window.renderRoster(); 
                 }
             });
 
@@ -336,7 +342,7 @@
                 const activeCount = Object.values(pData).filter(p => !p.kicked).length;
                 document.getElementById('totalConnected').innerText = `CONNECTED: ${activeCount}`;
                 
-                renderRoster();
+                window.renderRoster();
             });
         }
 
@@ -386,11 +392,32 @@
             }, 100);
         }
 
-        function renderRoster() {
-            const div = document.getElementById('participantList'); div.innerHTML = ''; let rendered = new Set();
-            currentQueue.forEach((pid, idx) => { if(pData[pid] && !pData[pid].kicked){ div.appendChild(createRow(pid, pData[pid], idx + 1)); rendered.add(pid); } });
-            for (let pid in pData) { if (!rendered.has(pid) && !pData[pid].kicked) div.appendChild(createRow(pid, pData[pid], null)); }
-        }
+        window.renderRoster = () => {
+            const div = document.getElementById('participantList'); 
+            div.innerHTML = ''; 
+            const searchTerm = document.getElementById('searchRoster') ? document.getElementById('searchRoster').value.toLowerCase() : "";
+            let rendered = new Set();
+            
+            currentQueue.forEach((pid, idx) => { 
+                if(pData[pid] && !pData[pid].kicked){ 
+                    const matchName = pData[pid].name.toLowerCase().includes(searchTerm);
+                    const matchTeam = pData[pid].team && pData[pid].team.toLowerCase().includes(searchTerm);
+                    if(searchTerm === "" || matchName || matchTeam) {
+                        div.appendChild(createRow(pid, pData[pid], idx + 1)); 
+                        rendered.add(pid); 
+                    }
+                } 
+            });
+            for (let pid in pData) { 
+                if (!rendered.has(pid) && !pData[pid].kicked) {
+                    const matchName = pData[pid].name.toLowerCase().includes(searchTerm);
+                    const matchTeam = pData[pid].team && pData[pid].team.toLowerCase().includes(searchTerm);
+                    if(searchTerm === "" || matchName || matchTeam) {
+                        div.appendChild(createRow(pid, pData[pid], null)); 
+                    }
+                }
+            }
+        };
 
         function createRow(pid, data, qPos) {
             const row = document.createElement('div'); row.className = 'participant-card';
@@ -427,11 +454,11 @@
         
         window.grantParole = async (pid) => { 
             const mins = parseInt(document.getElementById('manualTimer').value) || parseInt(document.getElementById('baseTimer').value) || 5; 
-            await updateDoc(doc(db, "debates", sessionCode), { activeSpeakerId: pid, activeSpeakerName: pData[pid].name, activeTeam: pData[pid].team, activeSide: pData[pid].side, endTimeMs: Date.now() + (mins * 60000), isTimerRunning: true, queue: arrayRemove(pid) }); 
+            await updateDoc(doc(db, "debates", sessionCode), { activeSpeakerId: pid, activeSpeakerName: pData[pid].name, activeTeam: pData[pid].team, activeSide: pData[pid].side, endTimeMs: Date.now() + (mins * 60000), isTimerRunning: true, queue: arrayRemove(pid), speakerRemainingMs: null }); 
             appendLog(`PAROLE GRANTED: ${pData[pid].name}`); 
         };
         
-        window.revokeFloor = async () => { await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open" }); appendLog("FLOOR REVOKED"); };
+        window.revokeFloor = async () => { await updateDoc(doc(db, "debates", sessionCode), { isTimerRunning: false, activeSpeakerId: null, activeSpeakerName: "Floor Open", speakerRemainingMs: null }); appendLog("FLOOR REVOKED"); };
         
         window.directMessage = async (pid) => {
             const m = prompt(`Direct private message to ${pData[pid].name}:`);
