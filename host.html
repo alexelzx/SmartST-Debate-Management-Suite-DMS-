@@ -146,10 +146,16 @@
 
                 <div class="right-column">
                     <div class="panel" style="background: #faf9f7;">
-                        <h3>Executive Audit Log</h3>
+                        <h3 style="justify-content: space-between;">
+                            <span>Executive Audit Log</span>
+                            <button class="btn-outline" style="font-size: 0.65rem; padding: 0.4rem 0.8rem;" onclick="downloadLog('fullLog', 'Executive_Audit_Log')">DOWNLOAD</button>
+                        </h3>
                         <div class="log-box" id="fullLog"></div>
                         
-                        <h3 style="color: var(--danger); border-color: rgba(179, 38, 30, 0.2);">Disciplinary Log</h3>
+                        <h3 style="color: var(--danger); border-color: rgba(179, 38, 30, 0.2); justify-content: space-between;">
+                            <span>Disciplinary Log</span>
+                            <button class="btn-outline" style="font-size: 0.65rem; padding: 0.4rem 0.8rem; color: var(--danger); border-color: var(--danger);" onclick="downloadLog('warnLog', 'Disciplinary_Log')">DOWNLOAD</button>
+                        </h3>
                         <div class="log-box" id="warnLog" style="border-left: 4px solid var(--danger); height: 200px;"></div>
                     </div>
                 </div>
@@ -177,13 +183,11 @@
         onAuthStateChanged(auth, (user) => { 
             const hasModPermission = sessionParam ? localStorage.getItem(`mod_auth_${sessionParam.toUpperCase()}`) === "true" : false;
             if (!user && !hasModPermission && !isModJoin) { 
-                // Only redirect if absolutely no auth tokens exist. 
-                // If you are relying on purely parameter-based auth for testing, comment out the line below.
                 window.location.href = "auth.html"; 
                 return;
             }
             if (isModJoin && sessionParam) {
-                sessionCode = sessionParam.toUpperCase(); // Force Uppercase Validation
+                sessionCode = sessionParam.toUpperCase(); 
                 document.getElementById('displayCode').innerText = sessionCode;
                 document.getElementById('init-state').style.display = 'none';
                 document.getElementById('active-state').style.display = 'block';
@@ -216,7 +220,7 @@
             try {
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                 let code = ''; for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-                sessionCode = code.toUpperCase(); // Force Uppercase
+                sessionCode = code.toUpperCase(); 
                 
                 const totalMs = (parseInt(document.getElementById('totalTimer').value) || 60) * 60000;
 
@@ -509,6 +513,38 @@
                 appendLog(`EXPULSION: ${pData[pid].name} has been kicked.`);
                 appendWarnLog(`KICKED -> ${pData[pid].name}`);
             }
+        };
+
+        // Added Export Functionality
+        window.downloadLog = (logId, prefix) => {
+            const logBox = document.getElementById(logId);
+            if (!logBox) return;
+            
+            let logText = `SmartST DMS - ${prefix.replace(/_/g, ' ')}\n`;
+            logText += `Session: ${sessionCode || 'UNKNOWN'}\n`;
+            logText += `Date: ${new Date().toLocaleDateString()}\n`;
+            logText += `----------------------------------------\n\n`;
+            
+            const entries = Array.from(logBox.querySelectorAll('.log-entry'));
+            entries.reverse().forEach(entry => {
+                logText += entry.innerText.trim() + '\n';
+            });
+            
+            if (entries.length === 0) {
+                logText += "No events recorded.";
+            }
+            
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${prefix}_${sessionCode || 'Draft'}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            appendLog(`SYSTEM: ${prefix.replace(/_/g, ' ')} exported.`);
         };
     </script>
 </body>
