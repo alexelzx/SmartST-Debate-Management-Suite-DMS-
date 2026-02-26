@@ -158,9 +158,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, updateDoc, collection, onSnapshot, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0", authDomain: "smartst-debate.firebaseapp.com", projectId: "smartst-debate", storageBucket: "smartst-debate.firebasestorage.app", messagingSenderId: "128238171772", appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9" };
         const app = initializeApp(firebaseConfig);
@@ -175,13 +175,15 @@
         const sessionParam = urlParams.get('code');
 
         onAuthStateChanged(auth, (user) => { 
-            const hasModPermission = sessionParam ? localStorage.getItem(`mod_auth_${sessionParam}`) === "true" : false;
-            if (!user && !hasModPermission) { 
+            const hasModPermission = sessionParam ? localStorage.getItem(`mod_auth_${sessionParam.toUpperCase()}`) === "true" : false;
+            if (!user && !hasModPermission && !isModJoin) { 
+                // Only redirect if absolutely no auth tokens exist. 
+                // If you are relying on purely parameter-based auth for testing, comment out the line below.
                 window.location.href = "auth.html"; 
                 return;
             }
             if (isModJoin && sessionParam) {
-                sessionCode = sessionParam;
+                sessionCode = sessionParam.toUpperCase(); // Force Uppercase Validation
                 document.getElementById('displayCode').innerText = sessionCode;
                 document.getElementById('init-state').style.display = 'none';
                 document.getElementById('active-state').style.display = 'block';
@@ -190,7 +192,14 @@
             }
         });
 
-        window.handleLogout = () => signOut(auth).then(() => window.location.href = "index.html");
+        window.handleLogout = () => {
+            if (auth.currentUser) {
+                signOut(auth).then(() => window.location.href = "index.html");
+            } else {
+                window.location.href = "index.html";
+            }
+        };
+        
         window.launchTV = () => window.open(`tv.html?code=${sessionCode}`, 'Projector', 'width=1280,height=720');
 
         function appendLog(action) {
@@ -207,7 +216,7 @@
             try {
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                 let code = ''; for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-                sessionCode = code;
+                sessionCode = code.toUpperCase(); // Force Uppercase
                 
                 const totalMs = (parseInt(document.getElementById('totalTimer').value) || 60) * 60000;
 
@@ -222,7 +231,7 @@
                 document.getElementById('tvBtn').style.display = 'inline-flex';
                 document.getElementById('displayCode').innerText = sessionCode;
                 
-                appendLog(`SESSION DEPLOYED: ${code}`);
+                appendLog(`SESSION DEPLOYED: ${sessionCode}`);
                 initSync();
             } catch (error) {
                 alert(`Execution Failed. Error: ${error.message}`);
