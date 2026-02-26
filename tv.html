@@ -22,7 +22,10 @@
 
         /* Navigation / Top Bar */
         nav { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 4rem; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-        .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 600; letter-spacing: -1px; }
+        .logo-container { display: flex; align-items: center; gap: 2rem; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 600; letter-spacing: -1px; margin: 0; }
+        .session-badge { font-family: monospace; font-size: 2rem; font-weight: bold; color: var(--text-color); background: rgba(255,255,255,0.7); padding: 0.4rem 1.5rem; border-radius: 12px; border: 1px solid var(--border); letter-spacing: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
         .master-clock { font-family: monospace; font-size: 3rem; font-weight: bold; background: var(--text-color); color: var(--bg-overlay); padding: 0.5rem 2.5rem; border-radius: 50px; display: flex; align-items: center; gap: 1rem; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .extra-badge { background: var(--success); color: #fff; font-size: 1.2rem; font-family: 'Inter', sans-serif; padding: 0.3rem 1rem; border-radius: 6px; display: none; text-transform: uppercase; letter-spacing: 2px;}
         
@@ -73,7 +76,10 @@
     <div id="educatorBanner">📢 EDUCATOR DIRECTIVE: <span></span></div>
 
     <nav>
-        <div class="logo">SmartST DMS.</div>
+        <div class="logo-container">
+            <div class="logo">SmartST DMS.</div>
+            <div class="session-badge" id="sessionCodeDisplay">JOIN CODE: ---</div>
+        </div>
         <div class="master-clock"><span id="masterClockDisplay">00:00:00</span> <span id="extraTimeBadge" class="extra-badge">Extra Time</span></div>
     </nav>
     
@@ -93,18 +99,23 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, collection, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, collection, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         
         const firebaseConfig = { apiKey: "AIzaSyC9TyyYR3_rIzi7lNt4mRwTiinefy1YQn0", authDomain: "smartst-debate.firebaseapp.com", projectId: "smartst-debate", storageBucket: "smartst-debate.firebasestorage.app", messagingSenderId: "128238171772", appId: "1:128238171772:web:c08fe0c458ed7d9630fbf9" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const urlParams = new URLSearchParams(window.location.search);
-        const joinCode = urlParams.get('code');
+        
+        const rawCode = urlParams.get('code');
+        const joinCode = rawCode ? rawCode.toUpperCase() : null;
         
         let timerInterval, masterTimerInterval, pNames = {};
 
         if (joinCode) {
+            // Display the Join Code immediately
+            document.getElementById('sessionCodeDisplay').innerText = `CODE: ${joinCode}`;
+
             const debateRef = doc(db, "debates", joinCode);
             const partsRef = collection(db, "debates", joinCode, "participants");
 
@@ -134,10 +145,12 @@
                     
                     renderQueue(data.queue || []);
                     
-                    // Crucial: Pass the speakerRemainingMs to ensure perfect sync during pauses
                     manageTimer(data.endTimeMs, data.isTimerRunning, data.speakerRemainingMs);
                 }
             });
+        } else {
+            // Failsafe for direct access without code
+            document.body.innerHTML = "<h1 style='text-align:center; color:#1C1C1C; margin-top:20%; font-family:Playfair Display;'>No Session Code Provided</h1>";
         }
 
         function renderQueue(queueArray) {
@@ -173,14 +186,12 @@
                 return `${m}:${s.toString().padStart(2, '0')}`;
             };
 
-            // If the timer is NOT running (e.g., Debate Paused or Floor Open)
             if (!isRunning) {
                 display.innerText = (remainingMs && remainingMs > 0) ? formatTime(remainingMs) : "00:00";
                 display.classList.remove('danger');
                 return;
             }
 
-            // If the timer IS running
             timerInterval = setInterval(() => {
                 const rem = endTime - Date.now();
                 if (rem <= 0) { 
